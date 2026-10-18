@@ -124,6 +124,113 @@ async function principal() {
       verifier(r.length === 0, "personnages sans modèle : " + r.join(", "));
     });
 
+    console.log("\nSkins");
+    await test("Catalogue : 10 collections, 4 raretés, skins valides et cosmétiques uniquement", async () => {
+      const r = await ev(async () => {
+        const { SKINS_ARMES, SKINS_AGENTS, COLLECTIONS, RARETES } = await import("./skins.js");
+        const { ARMES } = await import("./armes.js");
+        const statsAvant = JSON.stringify(Object.values(ARMES).map((a) => [a.degats, a.precision, a.cadence]));
+        const problemes = [];
+        for (const [id, s] of Object.entries({ ...SKINS_ARMES, ...SKINS_AGENTS })) {
+          if (!COLLECTIONS[s.collection]) problemes.push(id + " : collection inconnue");
+          if (!RARETES[s.rarete]) problemes.push(id + " : rareté inconnue");
+          for (const cle of ["degats", "precision", "cadence", "vitesse", "recul"]) if (cle in s && cle !== "vitesse") problemes.push(id + " : modifie " + cle);
+        }
+        const raretes = new Set(Object.values(SKINS_ARMES).map((s) => s.rarete));
+        const collections = new Set(Object.values(SKINS_ARMES).map((s) => s.collection));
+        return { n: Object.keys(SKINS_ARMES).length, tenues: Object.keys(SKINS_AGENTS).length, raretes: raretes.size, collections: collections.size, problemes, stats: statsAvant === JSON.stringify(Object.values(ARMES).map((a) => [a.degats, a.precision, a.cadence])) };
+      });
+      verifier(r.collections === 10, r.collections + " collections utilisées");
+      verifier(r.raretes === 4, r.raretes + " raretés utilisées");
+      verifier(r.n >= 20 && r.tenues >= 6, `${r.n} skins d'armes, ${r.tenues} tenues`);
+      verifier(!r.problemes.length, r.problemes.join("\n"));
+    });
+
+    await test("Chaque skin s'applique à chaque arme et change réellement les matériaux", async () => {
+      const r = await ev(async () => {
+        const { SKINS_ARMES } = await import("./skins.js");
+        const n = window.__neon, vue = n.vue;
+        const problemes = [];
+        const signature = (m) => {
+          const mats = new Set();
+          m.groupe.traverse((o) => { if (o.isMesh) mats.add(o.material); });
+          return [...mats];
+        };
+        for (const arme of ["pulsar", "fusil", "sniper", "pompe", "pistolet", "couteau"]) {
+          const vus = new Map();
+          for (const skin of Object.keys(SKINS_ARMES)) {
+            vue.equiper(arme, skin);
+            const m = vue.modele;
+            if (!m || m.id !== arme || m.skin !== skin) { problemes.push(`${arme}/${skin} : modèle absent`); continue; }
+            const mats = signature(m);
+            if (!mats.some((x) => x.userData && x.userData.motif)) problemes.push(`${arme}/${skin} : aucun motif appliqué`);
+            const cle = mats.filter((x) => x.userData && x.userData.motif).map((x) => x.uuid).sort().join();
+            if (vus.has(cle)) problemes.push(`${arme}/${skin} : mêmes matériaux que ${vus.get(cle)}`);
+            vus.set(cle, skin);
+            if (SKINS_ARMES[skin].ornement && !m.groupe.getObjectByName("ornement")) problemes.push(`${arme}/${skin} : ornement absent`);
+          }
+        }
+        vue.equiper("pistolet", "standard");
+        return problemes;
+      });
+      verifier(r.length === 0, r.slice(0, 12).join("\n"));
+    });
+
+    await test("Armurerie : changement rapide de skins, équipement sauvegardé, pas de fuite", async () => {
+      const r = await ev(async () => {
+        const n = window.__neon;
+        n.profil.d.niveau = 30;
+        n.ouvrirEcran("ecran-arsenal");
+        const geos0 = n.vitrine().renderer.info.memory.geometries;
+        const cartes = () => [...document.querySelectorAll(".carte-skin")];
+        for (let i = 0; i < 60; i++) {
+          const c = cartes();
+          c[i % c.length].click();
+          if (i % 7 === 0) document.querySelectorAll(".arme-onglet")[i % 6].click();
+        }
+        // Équipe le skin affiché sur l'arme affichée
+        const vue = document.querySelector(".carte-skin.vue");
+        const equiper = document.getElementById("fiche-equiper");
+        if (equiper.disabled) cartes().find((c) => !c.classList.contains("equipe")).click();
+        document.getElementById("fiche-equiper").click();
+        const arme = document.querySelector(".arme-onglet.actif strong").textContent;
+        const sauve = JSON.parse(localStorage.getItem("duostrike-profil")).skins;
+        // Deuxième passage identique : les modèles sont réutilisés (cache), le nombre de géométries ne grimpe pas
+        for (let i = 0; i < 60; i++) { const c = cartes(); c[i % c.length].click(); if (i % 7 === 0) document.querySelectorAll(".arme-onglet")[i % 6].click(); }
+        const geos1 = n.vitrine().renderer.info.memory.geometries;
+        for (let i = 0; i < 60; i++) { const c = cartes(); c[i % c.length].click(); if (i % 7 === 0) document.querySelectorAll(".arme-onglet")[i % 6].click(); }
+        const geos2 = n.vitrine().renderer.info.memory.geometries;
+        n.ouvrirEcran("ecran-menu");
+        return { sauve, arme, geos0, geos1, geos2, vue: !!vue };
+      });
+      verifier(Object.keys(r.sauve || {}).length >= 1, "aucun skin sauvegardé : " + JSON.stringify(r.sauve));
+      verifier(r.geos2 <= r.geos1 + 5, `géométries en hausse au 3e passage : ${r.geos1} → ${r.geos2}`);
+    });
+
+    await test("Tenues : changement rapide dans l'écran des personnages, tenue sauvegardée", async () => {
+      const r = await ev(async () => {
+        const n = window.__neon;
+        const { HEROS } = await import("./heros.js");
+        n.ouvrirEcran("ecran-agents");
+        const ids = Object.keys(HEROS);
+        for (let i = 0; i < 40; i++) {
+          n.afficherHeros(ids[i % ids.length]);
+          const t = document.querySelectorAll(".tenue");
+          t[i % t.length].click();
+        }
+        n.afficherHeros("titan");
+        [...document.querySelectorAll(".tenue")].find((b) => b.title.startsWith("Obsidienne")).click();
+        document.getElementById("tenue-equiper").click();
+        const m = n.vitrine().modele;
+        const motif = m.maillages.some((x) => x.material.userData && x.material.userData.motif);
+        n.ouvrirEcran("ecran-menu");
+        return { tenue: n.profil.tenue("titan"), heros: m.heros, modeleTenue: m.tenue, motif, qualite: n.qualite };
+      });
+      verifier(r.tenue === "obsidienne", "tenue non sauvegardée : " + r.tenue);
+      verifier(r.heros === "titan" && r.modeleTenue === "obsidienne", "le modèle affiché ne porte pas la tenue");
+      verifier(r.qualite === "basse" || r.motif, "aucun motif sur l'armure");
+    });
+
     console.log("\nPartie (deathmatch)");
     await test("Une partie se lance", async () => {
       await ev(async () => { const n = window.__neon; n.reglages.mode = "deathmatch"; n.reglages.carte = "nexus"; await n.demarrerPartie(); });
@@ -166,6 +273,7 @@ async function principal() {
     });
 
     await test("Tir, munitions, rechargement complet et pas de tir pendant le rechargement", async () => {
+      await ev(async () => { const n = window.__neon; n.allerAuMenu(); n.reglages.mode = "stand"; await n.demarrerPartie(); });
       const r = await ev(() => {
         const n = window.__neon, j = n.joueur, c = n.controles.cmd;
         j.donnerArme("fusil", true);
@@ -223,6 +331,7 @@ async function principal() {
     });
 
     await test("Bots : ils se déplacent et n'ont pas de position invalide (60 s simulées)", async () => {
+      await ev(async () => { const n = window.__neon; n.allerAuMenu(); n.reglages.mode = "deathmatch"; await n.demarrerPartie(); });
       const r = await ev(() => {
         const n = window.__neon;
         const bots = n.bots.liste.filter((b) => !b.mannequin);
@@ -238,13 +347,18 @@ async function principal() {
           n: bots.length,
           immobiles: bots.filter((b, i) => parcours[i] < 3).map((b) => b.nom),
           invalides: bots.filter((b) => [b.x, b.y, b.z].some(Number.isNaN)).map((b) => b.nom),
-          dansMur: bots.filter((b) => b.vivant && monde.bloque(b.x, b.z, b.y + 0.05)).map((b) => b.nom),
+          dansMur: bots.filter((b) => b.vivant && monde.bloque(b.x, b.z, b.y + 0.05, 0.3)).map((b) => {
+            const boite = monde.boites.find((o) => !o.traversable && b.y + 0.05 < o.maxY - 0.05 && b.y + 1.85 > o.minY && Math.hypot(b.x - Math.max(o.minX, Math.min(b.x, o.maxX)), b.z - Math.max(o.minZ, Math.min(b.z, o.maxZ))) < 0.3);
+            return b.nom + " (" + (boite ? boite.type || "décor" : "?") + ")";
+          }),
+          sansTenue: bots.filter((b) => !b.modele || b.modele.tenue !== b.tenue).map((b) => b.nom),
           depart: depart.length,
         };
       });
       verifier(r.n > 0, "aucun bot");
       verifier(!r.invalides.length, "positions NaN : " + r.invalides.join(", "));
       verifier(!r.dansMur.length, "bots dans un mur : " + r.dansMur.join(", "));
+      verifier(!r.sansTenue.length, "modèle de bot sans sa tenue : " + r.sansTenue.join(", "));
       verifier(r.immobiles.length <= Math.floor(r.n / 3), "bots immobiles : " + r.immobiles.join(", "));
     });
 

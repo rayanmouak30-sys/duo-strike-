@@ -6,6 +6,9 @@ import { Personnage } from "./personnages.js";
 import { ARMES, facteurDistance } from "./armes.js";
 import { HEROS, LISTE_HEROS } from "./heros.js";
 import { CAPACITES, nouvelEtatCapacites, majRecharges } from "./capacites.js";
+import { SKINS_AGENTS } from "./skins.js";
+
+const TENUES = Object.keys(SKINS_AGENTS);
 
 export const DIFFICULTES = {
   facile: { nom: "Facile", reaction: 0.85, erreur: 3.3, convergence: 1.7, tete: 0.04, rafale: [2, 3], facteurDegats: 0.34, vitesseDetection: 0.75, cadence: 0.19, ouie: 0.6, couvert: 0.3, pause: [0.6, 1.1], rotation: 4.5, utilitaires: 0.1 },
@@ -42,7 +45,7 @@ export function appliquerDegats(c, degats) {
 class Bot {
   constructor(o) {
     Object.assign(this, {
-      id: o.id, nom: o.nom, equipe: o.equipe, heros: o.heros || "kael", teinte: o.teinte || "neutre", mannequin: !!o.mannequin,
+      id: o.id, nom: o.nom, equipe: o.equipe, heros: o.heros || "kael", teinte: o.teinte || "neutre", mannequin: !!o.mannequin, tenue: o.tenue || "origine",
       taille: (HEROS[o.heros] && !o.mannequin ? HEROS[o.heros].apparence.taille : 1) || 1, capacites: null, capaciteT: 2,
       ruee: null, charge: null, chargeur: null,
       estJoueur: false, modele: null, x: 0, z: 0, y: 0, vx: 0, vz: 0, auSol: true, yaw: Math.PI, pitch: 0,
@@ -91,7 +94,9 @@ export class GestionBots {
   // ----- Création et placement -----
   ajouter(o) {
     const heros = o.heros || (o.mannequin ? "mannequin" : LISTE_HEROS[Math.floor(Math.random() * LISTE_HEROS.length)].id);
-    const b = new Bot({ ...o, heros, id: "b" + this.prochainId++ });
+    // Tenue cosmétique : la moitié des bots porte une tenue de la collection (lisibilité inchangée)
+    const tenue = o.tenue || (o.mannequin || Math.random() < 0.5 ? "origine" : TENUES[1 + Math.floor(Math.random() * (TENUES.length - 1))]);
+    const b = new Bot({ ...o, heros, tenue, id: "b" + this.prochainId++ });
     if (!b.mannequin) b.capacites = nouvelEtatCapacites(heros, !!o.economie);
     this.liste.push(b);
     return b;
@@ -109,9 +114,9 @@ export class GestionBots {
 
   // Met le bot en jeu (début de manche ou réapparition) avec son arme.
   placer(b, x, z, yaw = Math.PI) {
-    if (!b.modele || b.modele.armeId !== b.arme || b.modele.heros !== (b.mannequin ? "mannequin" : b.heros)) {
+    if (!b.modele || b.modele.armeId !== b.arme || b.modele.heros !== (b.mannequin ? "mannequin" : b.heros) || b.modele.tenue !== (b.mannequin ? "origine" : b.tenue)) {
       if (b.modele) this.scene.remove(b.modele.racine);
-      b.modele = new Personnage(b.mannequin ? "mannequin" : b.heros, b.mannequin ? "mannequin" : b.teinte, this.qualite, b.arme);
+      b.modele = new Personnage(b.mannequin ? "mannequin" : b.heros, b.mannequin ? "mannequin" : b.teinte, this.qualite, b.arme, b.mannequin ? "origine" : b.tenue);
       this.scene.add(b.modele.racine);
     } else b.modele.ressusciter();
     const def = ARMES[b.arme];

@@ -4,6 +4,7 @@ import * as THREE from "three";
 import { boiteRonde, membre, revolution, Assemblage, ik2, Ressort } from "./formes.js";
 import { textureEclat, textureReticule, textureTissu } from "./textures.js";
 import { piecesArme, materiauxArme, detailsArme, dessinerEcran, ARMES } from "./armes.js";
+import { ornerArme, skinArme } from "./skins.js";
 
 // Placement de chaque arme dans le champ de vision
 const CADRAGE = {
@@ -163,10 +164,11 @@ export class VueArme {
       groupe.add(verre, reticule);
     }
     const details = detailsArme(id, groupe, ARMES[id].chargeur);
+    ornerArme(groupe, skin, points);
     racine.visible = false;
     this.arme.add(racine);
     return {
-      id, racine, groupe, cfg, points, ecran: details ? details.ecran : null, matLumiere: mats.lumiere,
+      id, skin, inspection: skinArme(skin).inspection || "standard", racine, groupe, cfg, points, ecran: details ? details.ecran : null, matLumiere: mats.lumiere,
       pieces: { chargeur, culasse, levier, pompe },
       chargeurRepos: chargeur.position.clone(),
       hanche: new THREE.Vector3(...cfg.hanche),
@@ -187,8 +189,9 @@ export class VueArme {
     this.flash.position.copy(m.points.bouche);
     this.lumiereFlash.position.copy(m.points.bouche);
     const def = ARMES[id];
-    this.matFlash.color.setHex(def.couleurFlash || 0xffd6a0);
-    this.lumiereFlash.color.setHex(def.couleurFlash || 0xffc27a);
+    const s = skinArme(skin);
+    this.matFlash.color.setHex(s.flash || def.couleurFlash || 0xffd6a0);
+    this.lumiereFlash.color.setHex(s.flash || def.couleurFlash || 0xffc27a);
     this.sortie = 1;
     this.dureeSortie = Math.max(0.2, duree);
     this.coupT = 1;
@@ -204,7 +207,11 @@ export class VueArme {
     }
   }
 
-  inspecter() { if (this.sortie <= 0 && this.coupT >= 1) this.inspectT = 0; }
+  inspecter() {
+    if (this.sortie > 0 || this.coupT < 1 || !this.modele) return;
+    this.inspectT = 0;
+    this.dureeInspection = this.modele.inspection === "virtuose" ? 3.2 : 2.2;
+  }
 
   tir() {
     const m = this.modele;
@@ -400,13 +407,29 @@ export class VueArme {
     }
     // Inspection de l'arme (touche Y)
     if (this.inspectT < 1) {
-      this.inspectT = Math.min(1, this.inspectT + dt / 2.2);
-      const k = seg(this.inspectT, 0, 0.2) * (1 - seg(this.inspectT, 0.8, 1));
-      const tour = seg(this.inspectT, 0.25, 0.75);
-      rotZ += k * (0.7 - tour * 1.2);
-      rotY += k * 0.5;
-      rotX += k * 0.2;
-      posX -= k * 0.05;
+      this.inspectT = Math.min(1, this.inspectT + dt / (this.dureeInspection || 2.2));
+      const t = this.inspectT;
+      const k = seg(t, 0, 0.2) * (1 - seg(t, 0.8, 1));
+      if (m.inspection === "virtuose") {
+        // Présentation des skins légendaires (mains toujours sur l'arme) : flanc gauche tourné vers le joueur,
+        // balayage vers le flanc droit, bascule pour montrer le dessus, puis retour en position
+        const leve = seg(t, 0, 0.14) * (1 - seg(t, 0.86, 1));
+        const gauche = seg(t, 0.08, 0.3) * (1 - seg(t, 0.42, 0.6));
+        const droite = seg(t, 0.45, 0.62) * (1 - seg(t, 0.7, 0.82));
+        const dessus = seg(t, 0.66, 0.76) * (1 - seg(t, 0.8, 0.9));
+        rotY += gauche * 1.05 - droite * 0.85;
+        rotZ += leve * 0.18 + gauche * 0.35 - droite * 0.25;
+        rotX += leve * 0.12 + dessus * 0.75;
+        posX -= leve * 0.07 - droite * 0.03;
+        posY += leve * 0.035 + dessus * 0.02;
+        posZ -= leve * 0.05;
+      } else {
+        const tour = seg(t, 0.25, 0.75);
+        rotZ += k * (0.7 - tour * 1.2);
+        rotY += k * 0.5;
+        rotX += k * 0.2;
+        posX -= k * 0.05;
+      }
     }
 
     this.arme.rotation.set(rotX, rotY, rotZ);

@@ -9,6 +9,7 @@ import { boiteRonde, membre, revolution, Assemblage, ik2, Ressort } from "./form
 import { textureTissu, texturePlaque } from "./textures.js";
 import { piecesArme } from "./armes.js";
 import { HEROS } from "./heros.js";
+import { apparenceAvecSkin, habillerMateriaux } from "./skins.js";
 import { mergeGeometries } from "three/addons/utils/BufferGeometryUtils.js";
 
 export const COULEURS_EQUIPE = { bleu: 0x4fd2ff, rouge: 0xff4655 };
@@ -42,8 +43,8 @@ function materiauxCommuns(qualite) {
 
 // Matériaux d'un héros pour une équipe (gardés en cache)
 const cacheMateriaux = new Map();
-function materiauxHeros(qualite, cle, a, teinte) {
-  const id = cle + "|" + teinte;
+function materiauxHeros(qualite, cle, a, teinte, tenue = "origine") {
+  const id = cle + "|" + teinte + "|" + tenue;
   if (cacheMateriaux.has(id)) return cacheMateriaux.get(id);
   let c = materiauxCommuns(qualite);
   // La vitrine des menus découpe ses matériaux (animation d'apparition) : copies à part
@@ -68,6 +69,8 @@ function materiauxHeros(qualite, cle, a, teinte) {
   // PC modeste : deux matériaux (couleurs portées par les sommets) = deux appels de rendu par personnage
   mats.base = new THREE.MeshLambertMaterial({ vertexColors: true });
   mats.lueur = new THREE.MeshBasicMaterial({ vertexColors: true });
+  // Tenue : motif, finition et lueurs sur l'armure et les pièces secondaires (qualités Moyenne et Haute)
+  habillerMateriaux(mats, tenue, qualite);
   cacheMateriaux.set(id, mats);
   return mats;
 }
@@ -621,14 +624,16 @@ const HANCHE_GAUCHE = new THREE.Vector3(-0.2, -0.36, 0.06);
 
 export class Personnage {
   // heros : identifiant (heros.js) ; teinte : "bleu", "rouge" (bandes d'équipe), "neutre", "vitrine" ou "mannequin"
-  constructor(heros, teinte, qualite, armeId = "fusil") {
+  // tenue : skin de personnage (skins.js) — palette, motif et lueurs, sans changer la silhouette
+  constructor(heros, teinte, qualite, armeId = "fusil", tenue = "origine") {
     const h = HEROS[heros];
-    const a = h ? h.apparence : APPARENCE_MANNEQUIN;
+    this.tenue = h ? tenue : "origine";
+    const a = h ? apparenceAvecSkin(h.apparence, this.tenue) : APPARENCE_MANNEQUIN;
     this.heros = h ? heros : "mannequin";
     this.teinte = teinte;
     this.armeId = armeId;
     this.apparence = a;
-    const mats = materiauxHeros(qualite, this.heros, a, teinte);
+    const mats = materiauxHeros(qualite, this.heros, a, teinte, this.tenue);
     this.mats = mats;
     const simple = qualite === "basse";
     // Les pièces de l'arme reprennent les matériaux du corps (moins de matériaux = moins d'appels de rendu).
@@ -638,7 +643,7 @@ export class Personnage {
     this.echelle = a.taille || 1;
     const os = [];
     const pieces = [];
-    const cleCache = this.heros + "|" + armeId + (simple ? "|" + teinte : "");
+    const cleCache = this.heros + "|" + armeId + (simple ? "|" + teinte + "|" + this.tenue : "");
     const enCache = cacheGeometries.get(cleCache);
     DETAIL = simple ? 0.6 : 1;
     const nouvelOs = (parent) => { const b = new THREE.Bone(); os.push(b); if (parent) parent.add(b); return b; };

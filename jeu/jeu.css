@@ -448,3 +448,68 @@ kbd { font-family: var(--titre); font-size: 12px; padding: 4px 9px; border: 1px 
 .ligne-arsenal strong { cursor: pointer; }
 .ligne-arsenal.vue strong { color: var(--cyan); }
 #tactile .bt svg { width: 55%; height: 55%; display: block; margin: auto; pointer-events: none; }
+
+/* ===== Armurerie ===== */
+.ecran.ecran-armurerie { flex-direction: column; align-items: stretch; justify-content: flex-start; gap: 14px; padding: 18px 24px; background: radial-gradient(ellipse at 45% 35%, #1a2747, #03060e 70%); }
+.armurerie-entete { display: flex; align-items: center; gap: 18px; }
+.armurerie-entete h2 { margin: 0; }
+.armurerie-progression { margin-left: auto; color: var(--doux); font-size: 14px; }
+.armurerie-corps { flex: 1; min-height: 0; display: grid; grid-template-columns: 220px minmax(0, 1fr) minmax(300px, 380px); gap: 16px; }
+.armurerie-armes { display: flex; flex-direction: column; gap: 8px; overflow-y: auto; }
+.arme-onglet { display: grid; grid-template-columns: 48px 1fr; gap: 10px; align-items: center; padding: 8px; text-align: left; cursor: pointer;
+  background: var(--panneau); border: 1px solid var(--bord); border-left: 3px solid var(--rarete, var(--bord)); border-radius: 10px; transition: transform 0.25s, border-color 0.25s, background 0.25s; }
+.arme-onglet img { width: 48px; height: 48px; border-radius: 6px; }
+.arme-onglet strong { display: block; font-family: var(--titre); font-size: 13px; letter-spacing: 1px; }
+.arme-onglet small { color: var(--doux); font-size: 12px; }
+.arme-onglet:hover { transform: translateX(3px); }
+.arme-onglet.actif { background: rgba(124, 255, 212, 0.1); border-color: var(--cyan); }
+.armurerie-scene { position: relative; min-height: 0; display: flex; flex-direction: column; gap: 10px; }
+.ecran-armurerie .arsenal-apercu { flex: 1; height: auto; min-height: 260px; }
+.armurerie-scene .heros-aide { position: static; }
+.armurerie-fiche { --rarete: #a9b2c0; padding: 14px 16px; background: var(--panneau); border: 1px solid var(--bord); border-top: 3px solid var(--rarete); border-radius: 12px; display: grid; gap: 4px; }
+.fiche-rarete { font-family: var(--titre); font-size: 11px; letter-spacing: 3px; color: var(--rarete); text-transform: uppercase; }
+.armurerie-fiche h3 { margin: 0; font-family: var(--titre); font-size: 24px; letter-spacing: 1px; color: var(--texte); }
+.fiche-collection { color: var(--doux); font-size: 13px; margin: 0; }
+.fiche-texte { margin: 4px 0; }
+.fiche-atouts { display: flex; flex-wrap: wrap; gap: 6px; margin: 4px 0 8px; padding: 0; list-style: none; }
+.fiche-atouts li { font-size: 12px; padding: 3px 8px; border-radius: 999px; background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(255, 255, 255, 0.1); color: var(--doux); }
+.fiche-actions { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.fiche-actions .bouton-principal:disabled { opacity: 0.55; cursor: default; }
+.fiche-verrou { color: var(--jaune); font-size: 13px; }
+.armurerie-catalogue { min-height: 0; display: flex; flex-direction: column; gap: 10px; padding: 12px; background: var(--panneau); border: 1px solid var(--bord); border-radius: 12px; }
+.armurerie-filtres { display: flex; flex-wrap: wrap; gap: 6px; }
+.filtre-rarete { padding: 5px 10px; font-size: 12px; font-weight: 700; cursor: pointer; color: var(--rarete); background: rgba(6, 12, 26, 0.6); border: 1px solid var(--rarete); border-radius: 999px; opacity: 0.7; }
+.filtre-rarete.actif { opacity: 1; background: color-mix(in srgb, var(--rarete) 22%, transparent); }
+#filtre-collection { padding: 8px; background: rgba(6, 12, 26, 0.85); border: 1px solid var(--bord); border-radius: 8px; color: var(--texte); }
+.grille-skins { flex: 1; min-height: 0; overflow-y: auto; display: grid; grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); gap: 8px; align-content: start; }
+.carte-skin { position: relative; display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 8px 6px; cursor: pointer; text-align: center;
+  background: linear-gradient(180deg, color-mix(in srgb, var(--rarete) 14%, rgba(6, 12, 26, 0.8)), rgba(6, 12, 26, 0.85)); border: 1px solid color-mix(in srgb, var(--rarete) 45%, transparent);
+  border-radius: 10px; transition: transform 0.2s, box-shadow 0.2s; }
+.carte-skin img { width: 72px; height: 72px; border-radius: 6px; box-shadow: 0 4px 14px rgba(0, 0, 0, 0.5); }
+.carte-skin strong { font-size: 12px; line-height: 1.2; }
+.carte-skin small { font-size: 11px; color: var(--rarete); }
+.carte-skin:hover { transform: translateY(-2px); box-shadow: 0 6px 18px color-mix(in srgb, var(--rarete) 30%, transparent); }
+.carte-skin.vue { outline: 2px solid var(--rarete); outline-offset: 1px; }
+.carte-skin.equipe::after { content: "✓"; position: absolute; top: 4px; right: 6px; font-size: 13px; color: var(--cyan); font-weight: 800; }
+.carte-skin.verrouille img { filter: grayscale(0.7) brightness(0.6); }
+.carte-skin.verrouille small { color: var(--doux); }
+@media (max-width: 1100px) {
+  .armurerie-corps { grid-template-columns: 1fr; overflow-y: auto; }
+  .armurerie-armes { flex-direction: row; overflow-x: auto; }
+  .arme-onglet { min-width: 190px; }
+  .ecran-armurerie .arsenal-apercu { min-height: 220px; }
+  .grille-skins { max-height: none; overflow: visible; }
+}
+
+/* ===== Tenues (écran des personnages) ===== */
+.tenues { display: grid; gap: 6px; }
+.tenues-titre { display: flex; justify-content: space-between; align-items: baseline; font-family: var(--titre); font-size: 12px; letter-spacing: 2px; color: var(--doux); }
+.tenues-titre span { font-family: inherit; letter-spacing: 0; font-size: 12px; color: var(--texte); }
+.tenues-liste { display: flex; flex-wrap: wrap; gap: 6px; }
+.tenue { position: relative; width: 52px; height: 52px; padding: 0; cursor: pointer; border-radius: 8px; border: 2px solid color-mix(in srgb, var(--rarete) 60%, transparent); background: none; overflow: hidden; }
+.tenue img { width: 100%; height: 100%; display: block; }
+.tenue.vue { border-color: var(--rarete); box-shadow: 0 0 12px color-mix(in srgb, var(--rarete) 50%, transparent); }
+.tenue.equipe::after { content: "✓"; position: absolute; right: 3px; bottom: 1px; font-size: 12px; font-weight: 800; color: #fff; text-shadow: 0 0 4px #000; }
+.tenue.verrouille img { filter: grayscale(0.8) brightness(0.5); }
+.tenue.verrouille::before { content: "🔒"; position: absolute; inset: 0; display: grid; place-items: center; font-size: 16px; z-index: 1; }
+.tenue-actions { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; font-size: 13px; color: var(--doux); }

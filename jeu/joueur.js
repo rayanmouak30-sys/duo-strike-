@@ -5,6 +5,7 @@ import { RAYON_PERSO } from "./physique.js";
 import { ARMES, LogiqueArme, facteurDistance } from "./armes.js";
 import { CAPACITES, nouvelEtatCapacites, majRecharges } from "./capacites.js";
 import { HEROS } from "./heros.js";
+import { skinArme } from "./skins.js";
 
 // Touches de capacité -> emplacement
 const EMPLACEMENT_ACTION = { fumee: "c", flash: "q", signature: "e", ultime: "x" };
@@ -289,8 +290,12 @@ export class Joueur {
     if (this.camoT > 0) this.camoRevelT = 0.6;
     const oeil = _oeil.set(this.pos.x, this.yeux, this.pos.z);
     this.positionBouche(_bouche);
-    jeu.effets.flashTir(_bouche, def.couleurFlash);
-    if (def.energie) { this.directionVue(_dir); jeu.effets.etincellesEn(_bouche, _dir, def.couleurFlash, 3); }
+    // Couleurs cosmétiques du skin (traçante et flash) : la trajectoire et les dégâts ne changent pas
+    const skin = skinArme(this.skins[def.id]);
+    const couleurFlash = skin.flash || def.couleurFlash;
+    const couleurTrace = skin.traceur || def.couleurTrace || 0xffe9b8;
+    jeu.effets.flashTir(_bouche, couleurFlash);
+    if (def.energie) { this.directionVue(_dir); jeu.effets.etincellesEn(_bouche, _dir, couleurFlash, 3); }
     jeu.vue.tir();
     jeu.audio.tirJoueur(def.id);
     jeu.bots.entendre(this.pos.x, this.pos.z, 34, this);
@@ -302,7 +307,7 @@ export class Joueur {
       const cible = jeu.bots.toucher(this, oeil.x, oeil.y, oeil.z, _dir.x, _dir.y, _dir.z, tMur);
       const t = cible ? cible.t : tMur;
       _fin.copy(oeil).addScaledVector(_dir, t);
-      if (i < (def.plombs ? 5 : 1)) jeu.effets.tracante(_bouche, _fin, def.couleurTrace || 0xffe9b8, def.plombs ? 0.04 : def.energie ? 0.08 : 0.06);
+      if (i < (def.plombs ? 5 : 1)) jeu.effets.tracante(_bouche, _fin, couleurTrace, def.plombs ? 0.04 : def.energie || skin.traceur ? 0.08 : 0.06);
       if (i === 0) jeu.signalerTir(this, _bouche, _fin, def.id);
       if (cible) {
         const degats = def.degats[cible.partie] * facteurDistance(def, t);
@@ -316,7 +321,7 @@ export class Joueur {
         _n.set(mur.nx, mur.ny, mur.nz);
         if (mur.boite.competence) jeu.competences.degatsObjet(mur.boite.competence, def.degats.corps);
         else jeu.effets.trou(_fin, _n);
-        if (i < 4) { jeu.effets.etincellesEn(_fin, _n, def.energie ? def.couleurTrace : 0xffc27a, def.plombs ? 2 : 6); jeu.effets.poussiere(_fin, _n); }
+        if (i < 4) { jeu.effets.etincellesEn(_fin, _n, def.energie || skin.traceur ? couleurTrace : 0xffc27a, def.plombs ? 2 : 6); jeu.effets.poussiere(_fin, _n); }
         if (i === 0) jeu.audio.impact(_fin);
       }
     });

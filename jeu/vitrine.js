@@ -6,6 +6,7 @@ import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js";
 import { Personnage } from "./personnages.js";
 import { HEROS, CATEGORIES } from "./heros.js";
 import { piecesArme, materiauxArme, detailsArme, dessinerEcran, ARMES } from "./armes.js";
+import { ornerArme, skinArme, RARETES, animerSkins } from "./skins.js";
 
 export class Vitrine {
   constructor(qualite) {
@@ -107,23 +108,24 @@ export class Vitrine {
     this.contre.color.copy(c).lerp(new THREE.Color(0xffffff), 0.35);
   }
 
-  modeleDe(id) {
-    if (!this.modeles.has(id)) {
-      const m = new Personnage(id, "vitrine", this.qualite, HEROS[id].arme);
+  modeleDe(id, tenue = "origine") {
+    const cle = id + "|" + tenue;
+    if (!this.modeles.has(cle)) {
+      const m = new Personnage(id, "vitrine", this.qualite, HEROS[id].arme, tenue);
       for (const mesh of m.maillages) mesh.material.clippingPlanes = [this.decoupe];
       m.ombre.visible = false;
-      this.modeles.set(id, m);
+      this.modeles.set(cle, m);
     }
-    return this.modeles.get(id);
+    return this.modeles.get(cle);
   }
 
   // Affiche un personnage avec son animation d'apparition
-  montrerHeros(id, apparition = true) {
+  montrerHeros(id, apparition = true, tenue = "origine") {
     const h = HEROS[id];
     if (!h) return;
     if (this.arme) { this.scene.remove(this.arme); this.arme = null; }
     if (this.modele) this.scene.remove(this.modele.racine);
-    this.modele = this.modeleDe(id);
+    this.modele = this.modeleDe(id, tenue);
     this.idHeros = id;
     this.scene.add(this.modele.racine);
     this.modele.ressusciter();
@@ -147,6 +149,7 @@ export class Vitrine {
       for (const m of Object.values(mob)) g.add(m.construire(mats, false));
       const details = detailsArme(id, g, ARMES[id].chargeur);
       if (details && details.ecran) dessinerEcran(details.ecran, ARMES[id].chargeur);
+      ornerArme(g, skin, points);
       // Centrage : l'arme tourne autour de son milieu
       const boite = new THREE.Box3().setFromObject(g);
       const centre = boite.getCenter(new THREE.Vector3());
@@ -155,13 +158,15 @@ export class Vitrine {
       pivot.add(g);
       pivot.userData.longueur = boite.getSize(new THREE.Vector3()).length();
       this.armes.set(cle, pivot);
-      void points;
     }
     this.arme = this.armes.get(cle);
     this.scene.add(this.arme);
     this.socle.visible = false;
-    this.couleurs(0x7cffd4);
+    const s = skinArme(skin);
+    this.couleurs(RARETES[s.rarete].couleur);
     this.apparitionT = 1;
+    // Présentation : l'arme arrive en tournant ; plus marquée pour les skins épiques et légendaires
+    this.presentation = { t: 0, force: [0.4, 0.6, 1, 1.6][RARETES[s.rarete].rang] };
     this.vise = "arme";
   }
 
@@ -186,9 +191,15 @@ export class Vitrine {
 
   rendre(dt) {
     this.rotation += (this.rotationCible - this.rotation) * (1 - Math.exp(-8 * dt));
+    animerSkins(performance.now() / 1000);
     if (this.vise === "arme" && this.arme) {
-      this.rotationCible += dt * 0.5;
-      this.arme.rotation.set(0.12, this.rotation + Math.PI / 2, 0);
+      const p = this.presentation || { t: 1, force: 0 };
+      p.t = Math.min(1, p.t + dt / 1.4);
+      const e = 1 - Math.pow(1 - p.t, 3);
+      this.rotationCible += dt * (0.5 + (1 - e) * 4 * p.force);
+      this.arme.rotation.set(0.12 + (1 - e) * 0.3 * p.force, this.rotation + Math.PI / 2, (1 - e) * -0.25 * p.force);
+      this.arme.position.y = (1 - e) * -0.06 * p.force;
+      this.arme.scale.setScalar(0.85 + e * 0.15);
       const l = this.arme.userData.longueur || 0.8;
       this.camera.position.set(0, 0.04, l * 1.12 * this.distance);
       this.camera.lookAt(0, 0, 0);

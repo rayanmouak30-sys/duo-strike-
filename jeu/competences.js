@@ -850,9 +850,13 @@ export class Competences {
   poserTourelle(lanceur, dir, def, capId) {
     const monde = this.carte.monde;
     for (const t of [...this.tourelles]) if (t.lanceur === lanceur) this.detruireTourelle(t, false);
-    let d = 1.6;
+    let dMax = 1.6;
     const h = monde.rayon(lanceur.x, 0.5, lanceur.z, dir.x, 0, dir.z, 2.2);
-    if (h) d = Math.max(0.7, h.t - 0.5);
+    if (h) dMax = Math.max(0.7, h.t - 0.5);
+    // Jamais sur un combattant (il resterait enfermé dans la boîte de collision de la tourelle)
+    const libre = (px, pz) => !this.combattants().some((c) => c.vivant && c !== lanceur && Math.hypot(c.x - px, c.z - pz) < 0.75);
+    const d = [dMax, 1.2, 0.9, 0.7].find((v) => v <= dMax && libre(lanceur.x + dir.x * v, lanceur.z + dir.z * v));
+    if (d === undefined) return false;
     const x = lanceur.x + dir.x * d, z = lanceur.z + dir.z * d;
     const y = this.sol(x, z, (lanceur.y || 0) + 1.5).y;
     const t = { type: "tourelle", x, y, z, def, capId, lanceur, equipe: lanceur.equipe, vie: def.vie || 160, t: 0, duree: def.duree || 25, prochainTir: 0.8, cible: null, cherche: 0, angle: Math.atan2(dir.x, dir.z) };

@@ -11,6 +11,7 @@ import { construireCarte } from "./carte.js";
 import { CARTES, CARTES_JOUABLES } from "./cartes.js";
 import { GestionBots, DIFFICULTES, appliquerDegats } from "./bots.js";
 import { ARMES, SKINS } from "./armes.js";
+import { animerSkins, SKINS_AGENTS, RARETES, COLLECTIONS, vignetteSkin } from "./skins.js";
 import { VueArme } from "./vueArme.js";
 import { Personnage } from "./personnages.js";
 import { Hud } from "./hud.js";
@@ -23,7 +24,7 @@ import { HEROS, CATEGORIES, LISTE_HEROS, ORDRE_CATEGORIES, herosValide, NOMS_DIF
 import { Vitrine } from "./vitrine.js";
 import { Joueur, nouvellesStats } from "./joueur.js";
 import { Regles, MODES, DEFIS, ARTICLES, OBJECTIF_DM } from "./regles.js";
-import { Profil, SUCCES, NIVEAUX_SKINS, etatCompte, envoyerResultat, classement, connexion, inscription, deconnexion, chargerSauvegarde, envoyerSauvegarde } from "./profil.js";
+import { Profil, SUCCES, NIVEAUX_SKINS, NIVEAUX_TENUES, etatCompte, envoyerResultat, classement, connexion, inscription, deconnexion, chargerSauvegarde, envoyerSauvegarde } from "./profil.js";
 import { Controles, ACTIONS } from "./controles.js";
 import { Reseau, PartieEnLigne, adresseParDefaut, VERSION_PROTOCOLE } from "./reseau.js";
 
@@ -569,7 +570,13 @@ jeu.finPartie = () => {
   for (const [skin, n] of Object.entries(NIVEAUX_SKINS)) if (n > avantNiveau && n <= profilJ.d.niveau) {
     const d = document.createElement("div");
     d.className = "succes-mini";
-    d.textContent = "🎨 Skin débloqué : " + SKINS[skin].nom;
+    d.textContent = "🎨 Skin d'arme débloqué : " + SKINS[skin].nom;
+    finSucces.appendChild(d);
+  }
+  for (const [tenue, n] of Object.entries(NIVEAUX_TENUES)) if (n > avantNiveau && n <= profilJ.d.niveau) {
+    const d = document.createElement("div");
+    d.className = "succes-mini";
+    d.textContent = "🧥 Tenue débloquée : " + SKINS_AGENTS[tenue].nom;
     finSucces.appendChild(d);
   }
   // Classement en ligne
@@ -817,9 +824,10 @@ function majKillcam() {
   // Le joueur, vu par le tueur
   const arme = joueur.inventaire.principale || joueur.inventaire.secondaire || "pistolet";
   const teinteJoueur = MODES[regles.mode].equipes ? "bleu" : "neutre";
-  if (!modeleJoueur || modeleJoueur.armeId !== arme || modeleJoueur.heros !== joueur.heros || modeleJoueur.teinte !== teinteJoueur) {
+  const tenueJoueur = profilJ.tenue(joueur.heros);
+  if (!modeleJoueur || modeleJoueur.armeId !== arme || modeleJoueur.heros !== joueur.heros || modeleJoueur.teinte !== teinteJoueur || modeleJoueur.tenue !== tenueJoueur) {
     if (modeleJoueur) scene.remove(modeleJoueur.racine);
-    modeleJoueur = new Personnage(joueur.heros, teinteJoueur, qualite, arme);
+    modeleJoueur = new Personnage(joueur.heros, teinteJoueur, qualite, arme, tenueJoueur);
     scene.add(modeleJoueur.racine);
   }
   modeleJoueur.racine.visible = true;
@@ -988,6 +996,7 @@ function boucle(t) {
   requestAnimationFrame(boucle);
   horloge.update(t);
   const dt = Math.min(horloge.getDelta(), 0.1);
+  animerSkins(t / 1000);
   fpsT += dt; fpsN++;
   if (fpsT >= 0.5) { if (reglages.fps) $("fps").textContent = Math.round(fpsN / fpsT) + " FPS · " + Math.round(dyn.echelle * 100) + " %"; fpsT = 0; fpsN = 0; }
   const manette = controles.maj(dt, reglages);
@@ -1176,6 +1185,7 @@ function remplirModes() {
 let vitrine = null;
 function vitrineActive() { if (!vitrine) vitrine = new Vitrine(qualite); return vitrine; }
 let herosVu = null, filtreHeros = "tous", portraitsEnCours = false;
+const tenueVue = { heros: null, tenue: "origine" };   // tenue prévisualisée dans l'écran des personnages
 const etoiles = (n) => "★".repeat(n) + "☆".repeat(3 - n);
 const TOUCHES_CAP = ["fumee", "flash", "signature", "ultime"];
 
@@ -1254,8 +1264,52 @@ function afficherHeros(id, apparition) {
   bouton.textContent = deja ? "SÉLECTIONNÉ ✓" : "SÉLECTIONNER " + h.nom;
   bouton.classList.toggle("deja", deja);
   for (const t of document.querySelectorAll(".heros-tuile")) t.classList.toggle("actif", t.dataset.id === id);
-  if (vitrine) vitrine.montrerHeros(id, apparition);
+  if (tenueVue.heros !== id) { tenueVue.heros = id; tenueVue.tenue = profilJ.tenue(id); }
+  remplirTenues();
+  if (vitrine) vitrine.montrerHeros(id, apparition, tenueVue.tenue);
 }
+
+// Tenues : aperçu immédiat sur le modèle 3D, équipement si la tenue est débloquée
+function remplirTenues() {
+  const id = tenueVue.heros;
+  const liste = $("tenues-liste");
+  liste.innerHTML = "";
+  for (const [tid, t] of Object.entries(SKINS_AGENTS)) {
+    const ok = profilJ.tenueDebloquee(tid);
+    const b = document.createElement("button");
+    b.type = "button";
+    b.className = "tenue" + (tid === tenueVue.tenue ? " vue" : "") + (tid === profilJ.tenue(id) ? " equipe" : "") + (ok ? "" : " verrouille");
+    b.style.setProperty("--rarete", RARETES[t.rarete].couleur);
+    b.title = `${t.nom} — ${RARETES[t.rarete].nom}${ok ? "" : " (niveau " + t.niveau + ")"}`;
+    b.setAttribute("aria-label", b.title);
+    b.setAttribute("aria-pressed", String(tid === tenueVue.tenue));
+    b.innerHTML = "<img alt=''>";
+    b.querySelector("img").src = vignetteSkin(t, 52);
+    b.addEventListener("click", () => {
+      audio.clic();
+      tenueVue.tenue = tid;
+      remplirTenues();
+      if (vitrine) vitrine.montrerHeros(id, true, tid);
+    });
+    liste.appendChild(b);
+  }
+  const t = SKINS_AGENTS[tenueVue.tenue];
+  const ok = profilJ.tenueDebloquee(tenueVue.tenue);
+  const equipee = profilJ.tenue(id) === tenueVue.tenue;
+  $("tenue-nom").textContent = `${t.nom} · ${RARETES[t.rarete].nom}`;
+  $("tenue-nom").style.color = RARETES[t.rarete].couleur;
+  const b = $("tenue-equiper");
+  b.disabled = !ok || equipee;
+  b.textContent = equipee ? "Tenue équipée ✓" : ok ? "Équiper cette tenue" : "Verrouillée";
+  $("tenue-info").textContent = ok ? t.texte : `${t.texte} Se débloque au niveau ${t.niveau}.`;
+}
+$("tenue-equiper").addEventListener("click", () => {
+  if (!tenueVue.heros || !profilJ.tenueDebloquee(tenueVue.tenue)) return;
+  profilJ.d.tenues[tenueVue.heros] = tenueVue.tenue;
+  profilJ.sauver();
+  audio.achat(true);
+  remplirTenues();
+});
 
 function choisirHeros(id) {
   profilJ.d.agent = id;
@@ -1284,43 +1338,125 @@ function genererPortraits() {
   setTimeout(suivant, 120);
 }
 
-let armeVue = "pulsar";
+// ===== Armurerie : armes, collections, raretés, aperçu 3D et équipement =====
+const ORDRE_ARMES = ["pulsar", "fusil", "sniper", "pompe", "pistolet", "couteau"];
+const armurerie = { arme: "pulsar", skin: null, rarete: "toutes", collection: "toutes" };
+
+function skinEquipe(arme) { return profilJ.d.skins[arme] || "standard"; }
+
 function remplirArsenal() {
-  const el = $("liste-arsenal");
-  el.innerHTML = "";
+  const a = armurerie;
+  if (!a.skin) a.skin = skinEquipe(a.arme);
   const v = vitrineActive();
   v.attacher($("arsenal-apercu"));
   v.demarrer();
-  v.montrerArme(armeVue, profilJ.d.skins[armeVue] || "standard");
-  $("arsenal-nom").textContent = ARMES[armeVue].nom + " · " + SKINS[profilJ.d.skins[armeVue] || "standard"].nom;
-  for (const id of ["pulsar", "fusil", "sniper", "pompe", "pistolet", "couteau"]) {
-    const ligne = document.createElement("div");
-    ligne.className = "ligne-arsenal" + (id === armeVue ? " vue" : "");
-    const nom = document.createElement("strong");
-    nom.textContent = ARMES[id].nom;
-    nom.title = "Voir en 3D";
-    nom.addEventListener("click", () => { audio.clic(); armeVue = id; remplirArsenal(); });
-    ligne.appendChild(nom);
-    const skins = document.createElement("div");
-    skins.className = "skins";
-    for (const [sid, sk] of Object.entries(SKINS)) {
-      const b = document.createElement("button");
-      b.type = "button";
-      const ok = profilJ.skinDebloque(sid);
-      b.className = "skin" + ((profilJ.d.skins[id] || "standard") === sid ? " choisie" : "") + (ok ? "" : " verrouille");
-      b.style.setProperty("--c1", "#" + sk.carcasse.toString(16).padStart(6, "0"));
-      b.style.setProperty("--c2", "#" + sk.accent.toString(16).padStart(6, "0"));
-      b.title = ok ? sk.nom : `${sk.nom} : niveau ${NIVEAUX_SKINS[sid]}`;
-      b.innerHTML = "<i></i><span></span>";
-      b.querySelector("span").textContent = ok ? sk.nom : "Niv. " + NIVEAUX_SKINS[sid];
-      b.disabled = !ok;
-      b.addEventListener("click", () => { audio.clic(); profilJ.d.skins[id] = sid; profilJ.sauver(); armeVue = id; remplirArsenal(); });
-      skins.appendChild(b);
-    }
-    ligne.appendChild(skins);
-    el.appendChild(ligne);
+  v.montrerArme(a.arme, a.skin);
+
+  // Progression globale (skins débloqués)
+  const ids = Object.keys(SKINS);
+  const debloques = ids.filter((id) => profilJ.skinDebloque(id)).length;
+  $("armurerie-progression").textContent = `${debloques} / ${ids.length} skins débloqués · niveau ${profilJ.d.niveau}`;
+
+  // Liste des armes avec le skin équipé
+  const nav = $("armurerie-armes");
+  nav.innerHTML = "";
+  for (const id of ORDRE_ARMES) {
+    const b = document.createElement("button");
+    b.type = "button";
+    b.className = "arme-onglet" + (id === a.arme ? " actif" : "");
+    b.setAttribute("aria-pressed", String(id === a.arme));
+    const s = SKINS[skinEquipe(id)];
+    b.innerHTML = "<img alt=''><span><strong></strong><small></small></span>";
+    b.querySelector("img").src = vignetteSkin(s, 48);
+    b.querySelector("strong").textContent = ARMES[id].nom;
+    b.querySelector("small").textContent = s.nom;
+    b.style.setProperty("--rarete", RARETES[s.rarete].couleur);
+    b.addEventListener("click", () => { audio.clic(); a.arme = id; a.skin = skinEquipe(id); remplirArsenal(); });
+    nav.appendChild(b);
   }
+
+  // Filtres
+  const filtres = $("filtres-rarete");
+  filtres.innerHTML = "";
+  for (const [id, nom, couleur] of [["toutes", "Toutes", "#e9f1ff"], ...Object.values(RARETES).map((r) => [r.id, r.nom, r.couleur])]) {
+    const b = document.createElement("button");
+    b.type = "button";
+    b.className = "filtre-rarete" + (a.rarete === id ? " actif" : "");
+    b.setAttribute("aria-pressed", String(a.rarete === id));
+    b.textContent = nom;
+    b.style.setProperty("--rarete", couleur);
+    b.addEventListener("click", () => { audio.clic(); a.rarete = id; remplirArsenal(); });
+    filtres.appendChild(b);
+  }
+  const choix = $("filtre-collection");
+  if (!choix.options.length) {
+    choix.add(new Option("Toutes les collections", "toutes"));
+    for (const [id, c] of Object.entries(COLLECTIONS)) {
+      const n = ids.filter((s) => SKINS[s].collection === id);
+      choix.add(new Option(`${c.nom} (${n.filter((s) => profilJ.skinDebloque(s)).length}/${n.length})`, id));
+    }
+    choix.addEventListener("change", () => { armurerie.collection = choix.value; remplirArsenal(); });
+  }
+  choix.value = a.collection;
+
+  // Grille des skins (triés par rareté puis niveau)
+  const grille = $("grille-skins");
+  grille.innerHTML = "";
+  const liste = ids.map((id) => SKINS[id])
+    .filter((s) => (a.rarete === "toutes" || s.rarete === a.rarete) && (a.collection === "toutes" || s.collection === a.collection))
+    .sort((x, y) => RARETES[x.rarete].rang - RARETES[y.rarete].rang || x.niveau - y.niveau);
+  for (const s of liste) {
+    const ok = profilJ.skinDebloque(s.id);
+    const b = document.createElement("button");
+    b.type = "button";
+    b.className = "carte-skin" + (s.id === a.skin ? " vue" : "") + (s.id === skinEquipe(a.arme) ? " equipe" : "") + (ok ? "" : " verrouille");
+    b.style.setProperty("--rarete", RARETES[s.rarete].couleur);
+    b.setAttribute("aria-pressed", String(s.id === a.skin));
+    b.title = `${s.nom} — ${RARETES[s.rarete].nom}${ok ? "" : " (niveau " + s.niveau + ")"}`;
+    b.innerHTML = "<img alt=''><strong></strong><small></small>";
+    b.querySelector("img").src = vignetteSkin(s, 72);
+    b.querySelector("strong").textContent = s.nom;
+    b.querySelector("small").textContent = ok ? RARETES[s.rarete].nom : "🔒 Niveau " + s.niveau;
+    // Un skin verrouillé peut être prévisualisé, pas équipé
+    b.addEventListener("click", () => { audio.clic(); a.skin = s.id; remplirArsenal(); });
+    grille.appendChild(b);
+  }
+  if (!liste.length) grille.innerHTML = "<p class='astuce'>Aucun skin pour ces filtres.</p>";
+
+  // Fiche du skin prévisualisé
+  const s = SKINS[a.skin];
+  const r = RARETES[s.rarete];
+  const ok = profilJ.skinDebloque(s.id);
+  const equipe = skinEquipe(a.arme) === s.id;
+  $("armurerie-fiche").style.setProperty("--rarete", r.couleur);
+  $("fiche-rarete").textContent = r.nom;
+  $("fiche-nom").textContent = s.nom;
+  $("fiche-collection").textContent = COLLECTIONS[s.collection].nom + " · " + ARMES[a.arme].nom;
+  $("fiche-texte").textContent = s.texte;
+  const atouts = $("fiche-atouts");
+  atouts.innerHTML = "";
+  const lignes = [`Motif : ${NOMS_MOTIFS[s.motif] || s.motif}`];
+  if (s.animation && s.animation !== "aucune") lignes.push(`Effet lumineux : ${NOMS_ANIMATIONS[s.animation]}`);
+  if (s.ornement) lignes.push("Pièces décoratives exclusives");
+  if (s.traceur) lignes.push("Traçantes et flash aux couleurs du skin");
+  if (s.inspection === "virtuose") lignes.push("Inspection de présentation (touche Y)");
+  for (const t of lignes) { const li = document.createElement("li"); li.textContent = t; atouts.appendChild(li); }
+  const bouton = $("fiche-equiper");
+  bouton.disabled = !ok || equipe;
+  bouton.textContent = equipe ? "ÉQUIPÉ ✓" : ok ? "ÉQUIPER SUR " + ARMES[a.arme].nom.toUpperCase() : "VERROUILLÉ";
+  $("fiche-verrou").textContent = ok ? "" : `Se débloque au niveau ${s.niveau} (tu es niveau ${profilJ.d.niveau})`;
 }
+const NOMS_MOTIFS = { usure: "peinture de service", carbone: "fibre de carbone", camo: "camouflage numérique", hexagones: "nid d'abeille", circuits: "circuit imprimé", fissures: "fissures", facettes: "cristal facetté", filigrane: "filigrane gravé", nebuleuse: "nébuleuse", rayures: "bandes au pochoir", eclairs: "éclairs", damas: "acier damassé", ecailles: "écailles", lignes: "relevé topographique" };
+const NOMS_ANIMATIONS = { pulsation: "pulsation", flux: "flux d'énergie", scintillement: "scintillement", irisation: "irisation holographique" };
+$("fiche-equiper").addEventListener("click", () => {
+  const a = armurerie;
+  if (!profilJ.skinDebloque(a.skin)) return;
+  profilJ.d.skins[a.arme] = a.skin;
+  profilJ.sauver();
+  if (joueur) joueur.skins = { ...profilJ.d.skins };
+  audio.achat(true);
+  remplirArsenal();
+});
 
 function remplirCarriere() {
   const d = profilJ.d, s = d.stats;

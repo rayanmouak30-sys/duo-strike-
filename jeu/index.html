@@ -136,7 +136,7 @@
     <div class="grille-menu">
       <button type="button" class="tuile" data-ouvre="ecran-enligne"><strong>En ligne</strong><span>Joue avec tes amis</span></button>
       <button type="button" class="tuile" data-ouvre="ecran-agents"><strong>Personnages</strong><span id="tuile-agent"></span></button>
-      <button type="button" class="tuile" data-ouvre="ecran-arsenal"><strong>Arsenal</strong><span>Skins d'armes</span></button>
+      <button type="button" class="tuile" data-ouvre="ecran-arsenal"><strong>Armurerie</strong><span>Skins · collections</span></button>
       <button type="button" class="tuile" data-ouvre="ecran-carriere"><strong>Carrière</strong><span>Stats, succès, classement</span></button>
     </div>
     <div class="boutons-secondaires">
@@ -223,6 +223,11 @@
       <p class="heros-histoire" id="heros-histoire"></p>
       <p class="heros-perso"><b>Personnalité :</b> <span id="heros-perso"></span></p>
       <p class="heros-arme"><b>Arme de prédilection :</b> <span id="heros-arme"></span></p>
+      <div class="tenues" id="heros-tenues">
+        <div class="tenues-titre">TENUES <span id="tenue-nom"></span></div>
+        <div class="tenues-liste" id="tenues-liste" role="group" aria-label="Tenues du personnage"></div>
+        <div class="tenue-actions"><button type="button" class="bouton-lien" id="tenue-equiper">Équiper cette tenue</button><span id="tenue-info"></span></div>
+      </div>
       <div class="heros-capacites" id="heros-capacites"></div>
       <button type="button" class="bouton-principal" id="heros-choisir">SÉLECTIONNER</button>
     </div>
@@ -230,13 +235,34 @@
   <div class="heros-grille" id="heros-grille"></div>
 </div>
 
-<div id="ecran-arsenal" class="ecran">
-  <div class="panneau-menu large-g">
-    <h2>ARSENAL</h2>
-    <p class="accroche">Débloque des finitions en gagnant des niveaux, puis choisis-en une pour chaque arme. Clique sur le nom d'une arme pour la voir en 3D.</p>
-    <div class="arsenal-apercu" id="arsenal-apercu"><span id="arsenal-nom"></span></div>
-    <div id="liste-arsenal"></div>
-    <button type="button" class="bouton-principal petit" data-retour>Retour</button>
+<div id="ecran-arsenal" class="ecran ecran-armurerie">
+  <div class="armurerie-entete">
+    <button type="button" class="bouton-lien" data-retour>← Retour</button>
+    <h2>ARMURERIE</h2>
+    <p class="armurerie-progression" id="armurerie-progression"></p>
+  </div>
+  <div class="armurerie-corps">
+    <nav class="armurerie-armes" id="armurerie-armes" aria-label="Armes"></nav>
+    <section class="armurerie-scene">
+      <div class="arsenal-apercu" id="arsenal-apercu"></div>
+      <div class="armurerie-fiche" id="armurerie-fiche" aria-live="polite">
+        <span class="fiche-rarete" id="fiche-rarete"></span>
+        <h3 id="fiche-nom"></h3>
+        <p class="fiche-collection" id="fiche-collection"></p>
+        <p class="fiche-texte" id="fiche-texte"></p>
+        <ul class="fiche-atouts" id="fiche-atouts"></ul>
+        <div class="fiche-actions">
+          <button type="button" class="bouton-principal petit" id="fiche-equiper">ÉQUIPER</button>
+          <span class="fiche-verrou" id="fiche-verrou"></span>
+        </div>
+      </div>
+      <p class="heros-aide">Glisse pour tourner · molette pour zoomer · les raretés n'ont aucun effet sur les statistiques</p>
+    </section>
+    <section class="armurerie-catalogue">
+      <div class="armurerie-filtres" id="filtres-rarete" role="group" aria-label="Rareté"></div>
+      <select id="filtre-collection" aria-label="Collection"></select>
+      <div class="grille-skins" id="grille-skins"></div>
+    </section>
   </div>
 </div>
 

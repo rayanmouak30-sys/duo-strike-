@@ -3,7 +3,7 @@
 // Repère des modèles : avant = -Z, axe du canon à y = 0, poignée vers z positif.
 import * as THREE from "three";
 import { boiteRonde, profil, revolution, Assemblage } from "./formes.js";
-import { texturePolymere, textureAnodise, texturePeintureUsee } from "./textures.js";
+import { SKINS_ARMES, materiauxSkinArme } from "./skins.js";
 
 const DEG = Math.PI / 180;
 
@@ -197,48 +197,31 @@ export class LogiqueArme {
   }
 }
 
-// ===== Skins (finitions débloquables) =====
-export const SKINS = {
-  standard: { nom: "Standard", carcasse: 0x343a44, claire: 0x5a6270, polymere: 0x1d2026, accent: 0x7cffd4, metal: 0.75, coque: 0xb9bfc7, plaque: 0x2a5bd0, lumiere: 0x45f0ff },
-  neon: { nom: "Néon", carcasse: 0x1a1f2e, claire: 0x283350, polymere: 0x121522, accent: 0x3fa8ff, metal: 0.6, lueur: 1.6, coque: 0x2a3350, plaque: 0x3fa8ff, lumiere: 0x3fa8ff },
-  braise: { nom: "Braise", carcasse: 0x3a1c16, claire: 0x7a2c18, polymere: 0x1e1212, accent: 0xff7a2a, metal: 0.55, lueur: 1.4, coque: 0x3e2c27, plaque: 0xd4561e, lumiere: 0xffa040 },
-  carbone: { nom: "Carbone", carcasse: 0x17181b, claire: 0x2a2c31, polymere: 0x0f1012, accent: 0xe8e8f0, metal: 0.4, coque: 0x2c2e33, plaque: 0x17181b, lumiere: 0xe8e8f0 },
-  arctique: { nom: "Arctique", carcasse: 0xd8dde4, claire: 0x9fb4c8, polymere: 0x5c6c80, accent: 0x7cc4ff, metal: 0.35, coque: 0xd3dbe4, plaque: 0x7cc4ff, lumiere: 0x9fe0ff },
-  toxique: { nom: "Toxique", carcasse: 0x1f2a1a, claire: 0x3c5a22, polymere: 0x141a10, accent: 0x9cff3a, metal: 0.5, lueur: 1.5, coque: 0x2e3c25, plaque: 0x6fbf2a, lumiere: 0x9cff3a },
-  or: { nom: "Or royal", carcasse: 0x8a6a22, claire: 0xc9a24a, polymere: 0x231c12, accent: 0xffe08a, metal: 1.0, coque: 0xd6c48f, plaque: 0x8a6a22, lumiere: 0xffe08a },
-};
+// ===== Skins =====
+// Le catalogue (collections, raretés, motifs, ornements) est dans skins.js ; SKINS reste exporté pour l'interface.
+export const SKINS = SKINS_ARMES;
 
-const cacheMateriaux = new Map();
-export function materiauxArme(qualite, skin = "standard") {
-  const cle = qualite + skin;
-  if (cacheMateriaux.has(cle)) return cacheMateriaux.get(cle);
-  const s = SKINS[skin] || SKINS.standard;
-  const ano = textureAnodise(qualite);
-  const poly = texturePolymere(qualite);
+// Matériaux communs à tous les skins (acier, caoutchouc, laiton, verre...), puis surfaces peintes du skin
+const cacheCommuns = new Map();
+function materiauxCommunsArme(qualite) {
+  if (cacheCommuns.has(qualite)) return cacheCommuns.get(qualite);
   const m = {
-    carcasse: new THREE.MeshStandardMaterial({ color: s.carcasse, map: ano.map, roughnessMap: ano.roughnessMap, roughness: 0.55, metalness: s.metal }),
-    carcasseClaire: new THREE.MeshStandardMaterial({ color: s.claire, map: ano.map, roughnessMap: ano.roughnessMap, roughness: 0.45, metalness: s.metal }),
-    polymere: new THREE.MeshStandardMaterial({ color: s.polymere, map: poly.map, normalMap: qualite === "basse" ? null : poly.normalMap, roughness: 0.78, metalness: 0.05 }),
     caoutchouc: new THREE.MeshStandardMaterial({ color: 0x15171b, roughness: 0.95 }),
     acier: new THREE.MeshStandardMaterial({ color: 0x9aa1ab, roughness: 0.25, metalness: 0.95 }),
     acierSombre: new THREE.MeshStandardMaterial({ color: 0x23262b, roughness: 0.4, metalness: 0.85 }),
-    accent: new THREE.MeshStandardMaterial({ color: s.accent, emissive: s.accent, emissiveIntensity: s.lueur || 0.7, roughness: 0.4 }),
     laiton: new THREE.MeshStandardMaterial({ color: 0xc9a24a, roughness: 0.3, metalness: 1 }),
     cartouche: new THREE.MeshStandardMaterial({ color: 0xa8302a, roughness: 0.5 }),
     verre: new THREE.MeshStandardMaterial({ color: 0x9fd6ff, roughness: 0.05, metalness: 0.3, transparent: true, opacity: 0.18, depthWrite: false }),
     lentille: new THREE.MeshStandardMaterial({ color: 0x1a2a40, roughness: 0.05, metalness: 0.9, emissive: 0x0a1a30, emissiveIntensity: 1 }),
     lame: new THREE.MeshStandardMaterial({ color: 0xc8ced8, roughness: 0.18, metalness: 1 }),
+    cable: new THREE.MeshStandardMaterial({ color: 0xb3262a, roughness: 0.55, metalness: 0.05 }),
   };
-  // Pulsar : peinture usée (les éclats laissent voir le métal), plaques colorées, lumières, câbles
-  const peint = texturePeintureUsee(qualite);
-  const cartes = qualite === "basse" ? { map: peint.map } : { map: peint.map, roughnessMap: peint.roughnessMap, metalnessMap: peint.metalnessMap };
-  m.coque = new THREE.MeshStandardMaterial({ color: s.coque, ...cartes, roughness: qualite === "basse" ? 0.45 : 1, metalness: qualite === "basse" ? 0.15 : 1 });
-  m.coqueGrise = new THREE.MeshStandardMaterial({ color: 0x8b919b, ...cartes, roughness: qualite === "basse" ? 0.5 : 1, metalness: qualite === "basse" ? 0.25 : 1 });
-  m.plaque = new THREE.MeshStandardMaterial({ color: s.plaque, map: peint.map, roughness: 0.42, metalness: 0.3 });
-  m.lumiere = new THREE.MeshStandardMaterial({ color: s.lumiere, emissive: s.lumiere, emissiveIntensity: 1.4, roughness: 0.3 });
-  m.cable = new THREE.MeshStandardMaterial({ color: 0xb3262a, roughness: 0.55, metalness: 0.05 });
-  cacheMateriaux.set(cle, m);
+  cacheCommuns.set(qualite, m);
   return m;
+}
+
+export function materiauxArme(qualite, skin = "standard") {
+  return materiauxSkinArme(qualite, skin, materiauxCommunsArme(qualite));
 }
 
 // ===== Modèles =====

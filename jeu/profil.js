@@ -2,6 +2,7 @@
 // Le classement en ligne passe par api.php avec le compte du site (si le joueur est connecté).
 
 import { herosValide } from "./heros.js";
+import { SKINS_ARMES, SKINS_AGENTS } from "./skins.js";
 
 export const SUCCES = {
   premiereVictoire: { nom: "Première victoire", texte: "Gagne une partie.", icone: "🏆" },
@@ -22,8 +23,9 @@ export const SUCCES = {
   stand: { nom: "Diplômé du stand", texte: "Termine les 4 défis du stand de tir.", icone: "🎓" },
 };
 
-// Skins débloqués selon le niveau
-export const NIVEAUX_SKINS = { standard: 1, neon: 3, braise: 5, carbone: 7, arctique: 9, toxique: 12, or: 15 };
+// Skins débloqués selon le niveau (niveaux définis dans le catalogue skins.js)
+export const NIVEAUX_SKINS = Object.fromEntries(Object.entries(SKINS_ARMES).map(([id, s]) => [id, s.niveau || 1]));
+export const NIVEAUX_TENUES = Object.fromEntries(Object.entries(SKINS_AGENTS).map(([id, s]) => [id, s.niveau || 1]));
 
 export const VISEUR_DEFAUT = { couleur: "#7cffd4", longueur: 7, epaisseur: 2, ecart: 4, point: true, contour: true, dynamique: true };
 
@@ -31,7 +33,7 @@ const CLE = "duostrike-profil";
 
 function profilVide() {
   return {
-    pseudo: "", xp: 0, niveau: 1, agent: "kael", skins: {}, viseur: { ...VISEUR_DEFAUT },
+    pseudo: "", xp: 0, niveau: 1, agent: "kael", skins: {}, tenues: {}, viseur: { ...VISEUR_DEFAUT },
     stats: { parties: 0, victoires: 0, kills: 0, morts: 0, tetes: 0, aces: 0, poses: 0, desamorcages: 0, manches: 0 },
     armes: {}, succes: {}, defis: {},
   };
@@ -55,7 +57,10 @@ export class Profil {
     const d = { ...vide, ...objet(brut) };
     d.stats = { ...vide.stats, ...objet(d.stats) };
     d.viseur = { ...VISEUR_DEFAUT, ...objet(d.viseur) };
-    for (const k of ["skins", "succes", "defis", "armes"]) d[k] = { ...objet(d[k]) };
+    for (const k of ["skins", "tenues", "succes", "defis", "armes"]) d[k] = { ...objet(d[k]) };
+    // Skins inconnus (catalogue modifié) : retour à la finition standard
+    for (const [arme, s] of Object.entries(d.skins)) if (!SKINS_ARMES[s]) delete d.skins[arme];
+    for (const [agent, s] of Object.entries(d.tenues)) if (!SKINS_AGENTS[s]) delete d.tenues[agent];
     d.xp = Math.max(0, Number(d.xp) || 0);
     d.niveau = Math.max(1, Math.floor(Number(d.niveau) || 1));
     d.pseudo = String(d.pseudo || "").slice(0, 16);
@@ -73,6 +78,8 @@ export class Profil {
   get progression() { return this.d.xp / Profil.xpNiveau(this.d.niveau); }
 
   skinDebloque(id) { return this.d.niveau >= (NIVEAUX_SKINS[id] || 99); }
+  tenueDebloquee(id) { return this.d.niveau >= (NIVEAUX_TENUES[id] || 99); }
+  tenue(agent) { return this.d.tenues[agent] || "origine"; }
 
   gagnerXp(n) {
     const avant = this.d.niveau;
