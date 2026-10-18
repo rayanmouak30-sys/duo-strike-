@@ -465,7 +465,7 @@ export class Hud {
     if (j) {
       const x = px(j.x), y = py(j.z);
       const a = -j.lacet - Math.PI / 2;
-      ctx.fillStyle = "rgba(124,255,212,0.16)";
+      ctx.fillStyle = "rgba(240,207,134,0.16)";
       ctx.beginPath();
       ctx.moveTo(x, y);
       ctx.arc(x, y, 36, a - 0.6, a + 0.6);
