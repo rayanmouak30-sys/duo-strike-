@@ -5,7 +5,7 @@
 // à squelette : un appel de rendu par matériau pour tout le personnage, arme comprise.
 // Les couleurs d'équipe (bleu / rouge) sont portées par des bandes lumineuses pour rester lisibles.
 import * as THREE from "three";
-import { boiteRonde, membre, revolution, Assemblage, ik2, Ressort } from "./formes.js";
+import { boiteRonde, membre, revolution, drape, Assemblage, ik2, Ressort } from "./formes.js";
 import { textureTissu, texturePlaque } from "./textures.js";
 import { piecesArme } from "./armes.js";
 import { HEROS } from "./heros.js";
@@ -170,13 +170,12 @@ function piecesBassin(A, a) {
   A.ajouter(br(0.04, 0.035, 0.012, 0.004), a.buste === "combinaison" ? "accent" : "metal", { p: [0, 0.055, 0.115] });
   if (a.buste !== "combinaison") for (const x of [-0.12, 0.12]) A.ajouter(br(0.06, 0.07, 0.05, 0.012), "poly", { p: [x * k, 0.03, -0.11] });
   if (a.buste === "manteau") {
-    // Pans du manteau : arrière et côtés (ouverts devant pour laisser passer les jambes)
-    A.ajouter(br(0.34 * k, 0.56, 0.025, 0.01), "armure", { p: [0, -0.26, -0.13], r: [0.14, 0, 0] });
+    // Pans du manteau drapés : dos enveloppant et deux pans avant (ouverts pour laisser passer les jambes)
+    A.ajouter(drape(0.36 * k, 0.58, { evasement: 1.3, courbure: 0.09, plis: 3, amplitude: 0.014, recul: 0.05 }), "armure", { p: [0, 0.02, -0.105] });
     for (const s of [-1, 1]) {
-      A.ajouter(br(0.025, 0.52, 0.2, 0.01), "armure", { p: [s * 0.185 * k, -0.24, -0.02], r: [0, 0, s * 0.12] });
-      A.ajouter(br(0.11, 0.46, 0.022, 0.01), "armure", { p: [s * 0.13 * k, -0.22, 0.12], r: [-0.1, 0, s * 0.1] });
+      A.ajouter(drape(0.13, 0.5, { evasement: 1.25, courbure: -0.02, plis: 1.5, amplitude: 0.008, recul: -0.02 }), "armure", { p: [s * 0.13 * k, 0.0, 0.125], r: [0, s * 0.35, 0] });
     }
-    A.ajouter(br(0.3 * k, 0.02, 0.012, 0.004), "accent", { p: [0, -0.52, -0.168], r: [0.14, 0, 0] });
+    A.ajouter(br(0.3 * k, 0.02, 0.012, 0.004), "accent", { p: [0, -0.5, -0.165], r: [0.18, 0, 0] });
   }
   if (a.buste === "armureLourde") for (const s of [-1, 1]) A.ajouter(br(0.12, 0.16, 0.05, 0.02), "armure", { p: [s * 0.13 * k, -0.08, 0.1], r: [0.1, 0, s * 0.15] }); // tassettes
 }
@@ -288,7 +287,8 @@ function piecesDos(A, a, k) {
       A.ajouter(sphere(0.035, 12, 8), "accent", { p: [0, 0.17, z - 0.035] });
       break;
     case "cape":
-      A.ajouter(br(0.4 * k, 0.86, 0.02, 0.01), "secondaire", { p: [0, -0.17, z - 0.03], r: [0.11, 0, 0] });
+      // Cape drapée : plis qui se creusent vers le bas, bords qui enveloppent les épaules
+      A.ajouter(drape(0.42 * k, 0.9, { evasement: 1.35, courbure: 0.1, plis: 4, amplitude: 0.018, recul: 0.1 }), "secondaire", { p: [0, 0.27, z - 0.01] });
       A.ajouter(br(0.44 * k, 0.06, 0.06, 0.02), "secondaire", { p: [0, 0.27, z + 0.03] });
       break;
     case "bouclier": {

@@ -22,6 +22,39 @@ export function profil(points, epaisseur, biseau = 0.002, trous = []) {
   return geo;
 }
 
+// Pan de tissu drapé (cape, pans de manteau) qui pend vers -Y depuis l'origine.
+// largeur en haut, evasement : largeur du bas / largeur du haut ; courbure : les bords reviennent vers +Z
+// (autour du corps) ; plis : nombre d'ondulations, plus marquées vers le bas ; recul : le bas s'écarte vers -Z.
+// Deux faces (dessus et dessous) séparées par l'épaisseur : visible des deux côtés sans matériau double face.
+export function drape(largeur, hauteur, { evasement = 1.2, courbure = 0.05, plis = 4, amplitude = 0.012, recul = 0.04, epaisseur = 0.012, nx = 18, ny = 10 } = {}) {
+  const pos = [], idx = [];
+  const point = (i, j, face) => {
+    const u = i / nx, t = j / ny;
+    const l = largeur * (1 + (evasement - 1) * t);
+    const x = (u - 0.5) * l;
+    const xn = (u - 0.5) * 2;
+    let z = courbure * xn * xn - recul * t * t + Math.sin(u * Math.PI * 2 * plis) * amplitude * (0.25 + 0.75 * t);
+    if (face) z -= epaisseur;
+    return [x, -hauteur * t, z];
+  };
+  for (const face of [0, 1]) {
+    const base = pos.length / 3;
+    for (let j = 0; j <= ny; j++) for (let i = 0; i <= nx; i++) pos.push(...point(i, j, face));
+    for (let j = 0; j < ny; j++) for (let i = 0; i < nx; i++) {
+      const a = base + j * (nx + 1) + i, b = a + 1, c = a + nx + 1, d = c + 1;
+      if (face) idx.push(a, c, b, b, c, d); else idx.push(a, b, c, b, d, c);
+    }
+  }
+  const geo = new THREE.BufferGeometry();
+  geo.setAttribute("position", new THREE.Float32BufferAttribute(pos, 3));
+  geo.setIndex(idx);
+  geo.computeVertexNormals();
+  const uv = new Float32Array((pos.length / 3) * 2);
+  for (let k = 0; k < pos.length / 3; k++) { uv[k * 2] = pos[k * 3] / largeur + 0.5; uv[k * 2 + 1] = -pos[k * 3 + 1] / hauteur; }
+  geo.setAttribute("uv", new THREE.BufferAttribute(uv, 2));
+  return geo;
+}
+
 // Membre effilé (cuisse, bras...) dirigé vers -Y depuis l'origine, extrémités arrondies.
 export function membre(r1, r2, longueur, segments = 12) {
   const pts = [];

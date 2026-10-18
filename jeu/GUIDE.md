@@ -121,9 +121,26 @@ Les 80 capacités sont décrites par des données (`capacites.js`) et reposent s
 
 Boucliers : léger (+25, 400) et lourd (+50, 1000). L'**Arsenal** montre chaque arme en 3D avec la finition choisie.
 
+## Skins, armurerie et tenues
+
+Les skins sont **uniquement cosmétiques** : ils ne changent jamais les dégâts, la précision, la cadence ni la vitesse.
+
+- **23 skins d'armes** répartis en **10 collections** (Industriel militaire, Néon Cyber, Obsidienne, Technologie expérimentale, Énergie plasma, Cristal, Édition royale, Technologie holographique, Univers futuriste, Collection légendaire « Tempête ») et **4 raretés** :
+  - *Standard* : motif et finition de service ;
+  - *Rare* : motif exclusif (carbone, camouflage numérique, cristal, nid d'abeille...) ;
+  - *Épique* : lueurs animées (pulsation, flux d'énergie le long de l'arme, scintillement, irisation) ;
+  - *Légendaire* : pièces décoratives (bobines de confinement, cristaux, rubis et couronne de bouche, anneaux holographiques, paratonnerres avec arc électrique, crête de dragon), traçantes et flash aux couleurs du skin, **inspection de présentation** (touche Y).
+- Chaque skin s'applique aux six armes (pistolet, pompe, fusil, Pulsar, précision, couteau). Les motifs sont calculés par le jeu (aucune image téléchargée) et projetés sur l'arme sans déformation.
+- **Armurerie** (menu principal) : liste des armes, aperçu 3D (glisser pour tourner), filtres par rareté et par collection, fiche du skin, bouton Équiper. Un skin verrouillé peut être prévisualisé ; il se débloque avec le niveau.
+- **Tenues de personnages** (écran Personnages, rubrique Tenues) : 8 tenues (palette, motif de l'armure, lueurs) avec aperçu 3D immédiat. Les bandes d'équipe bleues et rouges ne changent jamais : un adversaire reste toujours reconnaissable. La moitié des bots porte une tenue.
+
+## Paramètres
+
+Sensibilité, inversion de l'axe vertical, champ de vision, balancement de la caméra et de l'arme ; volumes général, musique, ambiance, armes, effets et interface ; qualité graphique, ombres (désactivables), effets visuels réduits, luminosité, mini-carte ; viseur (couleur, longueur, épaisseur, écart, point, contour, dynamique) ; touches clavier et manette dans **Commandes**. Le bouton *Réinitialiser tous les paramètres* remet les valeurs d'origine.
+
 ## Progression
 
-XP et niveaux, succès, 7 finitions d'armes, viseur personnalisable, statistiques. Avec un compte du site, la progression, les touches et les réglages sont sauvegardés et reviennent sur un autre ordinateur ; le classement en ligne est mis à jour après chaque partie.
+XP et niveaux, succès, skins et tenues débloqués par niveau, viseur personnalisable, statistiques. Avec un compte du site, la progression, les touches et les réglages sont sauvegardés et reviennent sur un autre ordinateur ; le classement en ligne est mis à jour après chaque partie.
 
 ## Graphismes
 
@@ -155,10 +172,14 @@ Le jeu essaie d'abord le serveur temps réel (WebSocket, voir plus bas) ; s'il n
 
 Cette configuration AlwaysData n'a pas pu être testée depuis l'environnement de développement : si la connexion échoue, vérifier dans AlwaysData que le site Node.js est démarré.
 
+## Tests automatiques
+
+`node tests/jeu.test.cjs` depuis la racine du dépôt (PHP et Playwright nécessaires). 23 tests pilotent le vrai jeu dans Chromium : démarrage, menus, 20 personnages, 80 capacités, skins sur chaque arme, armurerie et tenues (changements rapides, absence de fuite), déplacement et collisions, caméra, tir, rechargement (complet et interrompu), changement d'arme, saut, paramètres, bots (60 s simulées), retour au menu, redimensionnement, erreurs de console.
+
 ## Ce qui est procédural (pour être honnête)
 
 Tout est créé par le code, sans fichiers 3D ni sons extraits d'autres jeux :
-- **Personnages** : assemblages de volumes simples (sphères, boîtes arrondies, profils extrudés) sur un squelette animé par cinématique inverse. Chacun a sa morphologie, son visage, sa coiffure, sa tenue, son équipement dorsal et ses couleurs, mais ce ne sont pas des modèles sculptés de jeu commercial. Les portraits sont rendus à partir de ces modèles.
+- **Personnages** : assemblages de volumes simples (sphères, boîtes arrondies, profils extrudés, pans de tissu drapés) sur un squelette animé par cinématique inverse. Chacun a sa morphologie, son visage, sa coiffure, sa tenue, son équipement dorsal et ses couleurs, mais ce ne sont pas des modèles sculptés de jeu commercial. Les portraits sont rendus à partir de ces modèles.
 - **Animations** : marche, course, visée, rechargement, chute, et 5 attitudes de repos réparties entre les 20 personnages (garde, prêt, arme sur l'épaule, inspection, décontracté) ; animation d'apparition dans la vitrine et colonne de lumière à la réapparition.
 - **Sons** : synthétisés en direct (Web Audio).
 - **Bots** : vraie vision (murs, fumées), stratégie d'équipe et usage des capacités par règles simples ; ils ne sautent pas.
