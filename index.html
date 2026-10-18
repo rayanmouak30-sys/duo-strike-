@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#050505">
+<title>OVERCLASH</title>
+<meta name="description" content="OVERCLASH : jeu de tir tactique en 3D, directement dans le navigateur. 20 agents, 5 modes, parties en ligne. Créé par Rayan et Clément.">
+<link rel="icon" href="logo.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700;900&family=Manrope:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="style.css">
+<!-- Three.js : la copie locale du jeu est réutilisée (aucun CDN, même version que le jeu) -->
+<script type="importmap">
+{ "imports": { "three": "./jeu/vendor/three/build/three.module.js", "three/addons/": "./jeu/vendor/three/examples/jsm/" } }
+</script>
+<script>document.documentElement.classList.add("js");</script>
+<script type="module" src="site/principal.js"></script>
+</head>
+<body>
+<a class="evitement" href="#contenu">Aller au contenu</a>
+
+<!-- Scène 3D en arrière-plan (purement décorative) -->
+<div class="scene" aria-hidden="true">
+  <canvas id="scene3d"></canvas>
+  <div class="scene-repli"></div>
+  <div class="grain"></div>
+  <div class="vignette"></div>
+</div>
+
+<!-- Écran d'introduction : disparaît dès que la scène est prête -->
+<div class="intro" aria-hidden="true">
+  <div class="intro-marque">OVERCLASH</div>
+  <div class="intro-barre"><span></span></div>
+</div>
+
+<!-- Rideau de transition vers le jeu -->
+<div class="rideau" aria-hidden="true"></div>
+
+<header class="entete">
+  <a class="marque" href="#accueil" aria-label="OVERCLASH, retour en haut">
+    <svg viewBox="0 0 40 40" aria-hidden="true"><use href="#icone-marque"/></svg>
+    <span>OVERCLASH</span>
+  </a>
+  <nav class="navigation" aria-label="Sections">
+    <a href="#jeu">Le jeu</a>
+    <a href="#modes">Modes</a>
+    <a href="#agents">Agents</a>
+    <a href="#classement">Classement</a>
+  </nav>
+  <a class="bouton bouton-petit" href="jeu/" data-jouer>Jouer</a>
+</header>
+
+<!-- Repère de progression : un trait par section -->
+<nav class="progression" aria-label="Progression dans la page">
+  <ol>
+    <li><a href="#accueil" data-section="accueil"><span>00</span><em>Accueil</em></a></li>
+    <li><a href="#jeu" data-section="jeu"><span>01</span><em>Le jeu</em></a></li>
+    <li><a href="#modes" data-section="modes"><span>02</span><em>Modes</em></a></li>
+    <li><a href="#agents" data-section="agents"><span>03</span><em>Agents</em></a></li>
+    <li><a href="#classement" data-section="classement"><span>04</span><em>Classement</em></a></li>
+    <li><a href="#entrer" data-section="entrer"><span>05</span><em>Entrer</em></a></li>
+  </ol>
+</nav>
+
+<main id="contenu">
+
+  <!-- 00 · ACCUEIL -->
+  <section class="section accueil" id="accueil" data-section="accueil">
+    <div class="accueil-haut">
+      <p class="etiquette apparition">FPS tactique · 3D temps réel · navigateur</p>
+      <p class="coordonnees apparition" style="--i:1">SECTEUR 00<br><span>ARÈNE PRINCIPALE</span></p>
+    </div>
+    <div class="accueil-bas">
+      <h1 class="titre-geant" aria-label="OVERCLASH">
+        <span class="ligne"><span>OVER</span></span><span class="ligne"><span>CLASH</span></span>
+      </h1>
+      <div class="accueil-texte voile">
+        <p class="chapeau apparition" style="--i:2">Cinq contre cinq. Vingt agents. Une arène où chaque seconde compte. Entre, tiens la ligne, et repars avec la manche.</p>
+        <div class="actions apparition" style="--i:3">
+          <a class="bouton bouton-or aimant" href="jeu/" data-jouer>
+            <span>Jouer maintenant</span>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h13M13 6l6 6-6 6"/></svg>
+          </a>
+          <a class="bouton bouton-verre aimant" href="#jeu">Découvrir</a>
+        </div>
+      </div>
+    </div>
+    <a class="defiler" href="#jeu" aria-label="Défiler vers la présentation du jeu"><span></span></a>
+  </section>
+
+  <!-- 01 · LE JEU -->
+  <section class="section jeu" id="jeu" data-section="jeu">
+    <div class="jeu-contenu voile">
+      <p class="etiquette apparition"><span class="numero">01</span> Le jeu</p>
+      <h2 class="titre-section apparition" style="--i:1">Un vrai FPS tactique.<br><em>Sans rien installer.</em></h2>
+      <p class="texte apparition" style="--i:2">Rendu 3D temps réel, physique des balles, capacités, boutique entre les manches, bots qui jouent en équipe : tout tourne directement dans ton navigateur, sur ordinateur, tablette ou téléphone.</p>
+      <dl class="chiffres">
+        <div class="chiffre apparition" style="--i:3"><dt>Agents</dt><dd data-compteur="20">20</dd></div>
+        <div class="chiffre apparition" style="--i:4"><dt>Modes de jeu</dt><dd data-compteur="5">5</dd></div>
+        <div class="chiffre apparition" style="--i:5"><dt>Cartes</dt><dd data-compteur="3">3</dd></div>
+        <div class="chiffre apparition" style="--i:6"><dt>Joueurs en ligne</dt><dd data-compteur="8">8</dd></div>
+      </dl>
+      <ul class="atouts">
+        <li class="apparition" style="--i:7">Clavier, souris, manette ou écran tactile</li>
+        <li class="apparition" style="--i:8">Progression, succès et réglages sauvegardés sur ton compte</li>
+        <li class="apparition" style="--i:9">Salons privés à code pour jouer entre amis</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 02 · MODES -->
+  <section class="section modes" id="modes" data-section="modes">
+    <div class="modes-entete voile">
+      <p class="etiquette apparition"><span class="numero">02</span> Modes de jeu</p>
+      <h2 class="titre-section apparition" style="--i:1">Cinq façons<br><em>d'entrer dans l'arène.</em></h2>
+    </div>
+    <div class="cartes-modes">
+      <article class="carte apparition" style="--i:2">
+        <svg class="carte-icone" viewBox="0 0 48 48" aria-hidden="true"><path d="M24 4l6 14h-12z M18 18h12v20l-6 6-6-6z"/><circle cx="24" cy="28" r="3"/></svg>
+        <h3>Spike</h3>
+        <p>Attaque et défense en 5 contre 5. Pose le spike sur le site A ou B, ou désamorce-le avant l'explosion.</p>
+        <span class="carte-info">5 manches gagnantes</span>
+      </article>
+      <article class="carte apparition" style="--i:3">
+        <svg class="carte-icone" viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="16"/><circle cx="24" cy="24" r="6"/><path d="M24 2v10M24 36v10M2 24h10M36 24h10"/></svg>
+        <h3>Élimination</h3>
+        <p>Les mêmes manches, sans objectif : la dernière équipe debout l'emporte.</p>
+        <span class="carte-info">Pas de réapparition</span>
+      </article>
+      <article class="carte apparition" style="--i:4">
+        <svg class="carte-icone" viewBox="0 0 48 48" aria-hidden="true"><path d="M8 40L40 8M8 8l32 32"/><circle cx="24" cy="24" r="5"/></svg>
+        <h3>Deathmatch</h3>
+        <p>Chacun pour soi, réapparition en 3 secondes. Le premier à 30 éliminations gagne.</p>
+        <span class="carte-info">8 minutes max</span>
+      </article>
+      <article class="carte apparition" style="--i:5">
+        <svg class="carte-icone" viewBox="0 0 48 48" aria-hidden="true"><rect x="8" y="10" width="32" height="28" rx="2"/><path d="M8 18h32M16 26h6M16 31h12"/></svg>
+        <h3>Stand de tir</h3>
+        <p>Entraînement libre et quatre défis chronométrés pour régler ta visée et tester les capacités.</p>
+        <span class="carte-info">Solo</span>
+      </article>
+      <article class="carte apparition" style="--i:6">
+        <svg class="carte-icone" viewBox="0 0 48 48" aria-hidden="true"><circle cx="16" cy="18" r="6"/><circle cx="32" cy="18" r="6"/><path d="M4 40c2-7 7-10 12-10s10 3 12 10M20 40c2-7 7-10 12-10s10 3 12 10"/></svg>
+        <h3>En ligne</h3>
+        <p>Crée un salon, donne le code de 4 lettres à tes amis : chacun pour soi, en équipes ou en coop contre des bots.</p>
+        <span class="carte-info">Jusqu'à 8 joueurs + 10 bots</span>
+      </article>
+    </div>
+  </section>
+
+  <!-- 03 · AGENTS (scène 3D : le personnage choisi apparaît sur le socle) -->
+  <section class="section agents" id="agents" data-section="agents">
+    <div class="agents-colle">
+      <div class="agents-panneau voile">
+        <p class="etiquette apparition"><span class="numero">03</span> Agents</p>
+        <h2 class="titre-section apparition" style="--i:1">Vingt agents.<br><em>Quatre capacités chacun.</em></h2>
+        <div class="categories apparition" style="--i:2" role="tablist" aria-label="Catégories d'agents"></div>
+        <div class="liste-agents apparition" style="--i:3" role="tabpanel" aria-label="Agents de la catégorie"></div>
+        <div class="fiche apparition" style="--i:4" aria-live="polite">
+          <p class="fiche-role"></p>
+          <h3 class="fiche-nom"></h3>
+          <p class="fiche-citation"></p>
+          <dl class="fiche-details"></dl>
+          <ul class="fiche-capacites"></ul>
+        </div>
+      </div>
+      <p class="agents-note">Modèle 3D en temps réel, le même que dans le jeu</p>
+    </div>
+  </section>
+
+  <!-- 04 · CLASSEMENT -->
+  <section class="section classement" id="classement" data-section="classement">
+    <div class="classement-contenu voile">
+      <p class="etiquette apparition"><span class="numero">04</span> Classement</p>
+      <h2 class="titre-section apparition" style="--i:1">Les meilleurs<br><em>de l'arène.</em></h2>
+      <div class="tableau apparition" style="--i:2">
+        <table>
+          <thead><tr><th scope="col">#</th><th scope="col">Joueur</th><th scope="col">Niveau</th><th scope="col">XP</th><th scope="col" class="option">Victoires</th><th scope="col" class="option">Éliminations</th></tr></thead>
+          <tbody id="lignes-classement"><tr><td colspan="6" class="tableau-etat">Chargement du classement…</td></tr></tbody>
+        </table>
+      </div>
+      <p class="astuce apparition" style="--i:3">Crée un compte dans le jeu (menu Compte) pour apparaître ici.</p>
+    </div>
+  </section>
+
+  <!-- 05 · ENTRER -->
+  <section class="section entrer" id="entrer" data-section="entrer">
+    <div class="entrer-contenu voile">
+      <p class="etiquette apparition"><span class="numero">05</span> Prêt ?</p>
+      <h2 class="titre-final apparition" style="--i:1">Le portail<br>est ouvert.</h2>
+      <a class="bouton bouton-or bouton-grand aimant apparition" style="--i:2" href="jeu/" data-jouer>
+        <span>Entrer dans l'arène</span>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h13M13 6l6 6-6 6"/></svg>
+      </a>
+      <p class="compatibilite apparition" style="--i:3">Chrome, Edge ou Firefox · rien à installer</p>
+    </div>
+  </section>
+</main>
+
+<footer class="pied">
+  <p>OVERCLASH — créé par <strong>Rayan</strong> et <strong>Clément</strong></p>
+  <p class="pied-tech">Three.js · WebGL · PHP</p>
+</footer>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <linearGradient id="degrade-or" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#f6e2a8"/><stop offset=".45" stop-color="#c9a052"/><stop offset="1" stop-color="#7a5a26"/>
+    </linearGradient>
+    <symbol id="icone-marque" viewBox="0 0 40 40">
+      <path d="M20 2l16 9v18l-16 9-16-9V11z" fill="none" stroke="url(#degrade-or)" stroke-width="2"/>
+      <path d="M20 9l9 5v12l-9 5-9-5V14z" fill="url(#degrade-or)" opacity=".9"/>
+      <path d="M20 14l5 3v6l-5 3-5-3v-6z" fill="#050505"/>
+    </symbol>
+  </defs>
+</svg>
+</body>
+</html>

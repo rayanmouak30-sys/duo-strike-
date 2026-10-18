@@ -1,0 +1,85 @@
+# Met le site OVERCLASH en ligne sur AlwaysData (FTP chiffré) à chaque envoi sur la branche main.
+# Les identifiants sont dans les "secrets" du dépôt GitHub, jamais dans le code :
+#   FTP_SERVER   (ex. ftp-NOMDUCOMPTE.alwaysdata.net)
+#   FTP_USERNAME (ex. NOMDUCOMPTE)
+#   FTP_PASSWORD
+#   SITE_URL     (ex. https://NOMDUCOMPTE.alwaysdata.net), pour la vérification après envoi
+# N'efface jamais rien sur le serveur et ne touche pas au dossier donnees/ (comptes, classement, salons).
+name: Mise en ligne sur AlwaysData
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: deploiement
+  cancel-in-progress: false
+
+jobs:
+  deploiement:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Vérifier que les identifiants FTP sont configurés
+        id: secrets
+        env:
+          FTP_SERVER: ${{ secrets.FTP_SERVER }}
+        run: |
+          if [ -z "$FTP_SERVER" ]; then
+            echo "Secrets FTP absents : ajoute FTP_SERVER, FTP_USERNAME, FTP_PASSWORD et SITE_URL dans Settings > Secrets and variables > Actions."
+            echo "ok=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "ok=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Récupérer le code
+        if: steps.secrets.outputs.ok == 'true'
+        uses: actions/checkout@v4
+
+      - name: Installer lftp
+        if: steps.secrets.outputs.ok == 'true'
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq lftp
+
+      - name: Envoyer les fichiers sur le serveur
+        if: steps.secrets.outputs.ok == 'true'
+        env:
+          FTP_SERVER: ${{ secrets.FTP_SERVER }}
+          FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
+          LFTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
+        run: |
+          lftp -c "
+            set ftp:ssl-force true;
+            set ftp:ssl-protect-data true;
+            set ssl:verify-certificate true;
+            set net:max-retries 3;
+            set net:timeout 30;
+            open --env-password -u \"$FTP_USERNAME\" \"$FTP_SERVER\";
+            mirror --reverse --verbose --no-perms --parallel=4 \
+              -x '^\.git' \
+              -x '^\.github/' \
+              -x '^donnees/' \
+              ./ /www/
+          "
+
+      - name: Vérifier le site en ligne
+        if: steps.secrets.outputs.ok == 'true'
+        env:
+          SITE: ${{ secrets.SITE_URL }}
+        run: |
+          [ -n "$SITE" ] || { echo "::warning::secret SITE_URL absent : vérification sautée"; exit 0; }
+          SITE="${SITE%/}"
+          echec=0
+          for page in "" jeu/ jeu/vendor/three/build/three.module.js; do
+            code=$(curl -s -o /dev/null -w "%{http_code}" "$SITE/$page")
+            if [ "$code" = "200" ]; then echo "OK  /$page"; else echo "::error::/$page répond $code"; echec=1; fi
+          done
+          if curl -s -H "X-Requested-With: duoneon" "$SITE/jeu/api.php?action=classement" | grep -q '"joueurs"'; then
+            echo "OK  jeu/api.php (classement)"
+          else
+            echo "::error::jeu/api.php ne répond pas correctement (PHP activé ?)"; echec=1
+          fi
+          for prive in donnees/utilisateurs.json jeu/serveur/serveur.js; do
+            code=$(curl -s -o /dev/null -w "%{http_code}" "$SITE/$prive")
+            if [ "$code" = "200" ]; then echo "::error::$prive est lisible depuis internet"; echec=1; else echo "OK  $prive protégé ($code)"; fi
+          done
+          exit $echec

@@ -1,0 +1,7 @@
+# Le dossier des comptes et des salons n'est jamais lisible depuis internet.
+RedirectMatch 404 ^/donnees(/|$)
+<IfModule mod_headers.c>
+  <FilesMatch "\.(html|css|js)$">
+    Header set Cache-Control "no-cache"
+  </FilesMatch>
+</IfModule>
