@@ -1,6 +1,6 @@
-# OVERCLASH
+# DUO STRIKE
 
-Site du jeu OVERCLASH, jeu de tir tactique en 3D qui tourne dans le navigateur, créé par **Rayan** et **Clément**.
+Site du jeu DUO STRIKE, jeu de tir tactique en 3D qui tourne dans le navigateur, créé par **Rayan** et **Clément**.
 
 ## Organisation
 

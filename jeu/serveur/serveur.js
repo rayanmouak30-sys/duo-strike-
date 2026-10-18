@@ -1,4 +1,4 @@
-// Serveur multijoueur de Duo Néon : salons à code, relais des positions et des tirs, score du deathmatch.
+// Serveur multijoueur de Duo Strike : salons à code, relais des positions et des tirs, score du deathmatch.
 // Node.js seul, aucune dépendance (WebSocket implémenté à la main, RFC 6455).
 // Lancer en local :  node jeu/serveur/serveur.js   puis ouvrir http://localhost:8080/
 "use strict";
@@ -335,4 +335,4 @@ setInterval(() => {
   for (const s of salons.values()) for (const c of s.joueurs.values()) envoyerTrame(c, Buffer.alloc(0), 0x9);
 }, 20000);
 
-serveur.listen(PORT, HOTE, () => console.log(`Duo Néon : serveur prêt sur http://localhost:${PORT}/ (WebSocket : ws://localhost:${PORT}/ws)`));
+serveur.listen(PORT, HOTE, () => console.log(`Duo Strike : serveur prêt sur http://localhost:${PORT}/ (WebSocket : ws://localhost:${PORT}/ws)`));

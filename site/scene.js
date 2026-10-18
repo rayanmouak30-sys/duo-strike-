@@ -1,4 +1,4 @@
-// Scène 3D du site OVERCLASH : un seul monde continu que la caméra traverse au fil du défilement.
+// Scène 3D du site DUO STRIKE : un seul monde continu que la caméra traverse au fil du défilement.
 //   Accueil   → le Noyau (cristal de verre épais, cage et anneaux en or brossé) sur son socle
 //   Le jeu    → la caméra tourne autour du Noyau
 //   Modes     → on passe à travers la grande arche, le couloir de piliers s'ouvre

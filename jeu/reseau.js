@@ -82,7 +82,7 @@ class RelaisHttp {
   async requete(corps) {
     const r = await fetch(new URL("enligne.php", location.href), {
       method: "POST",
-      headers: { "Content-Type": "application/json", "X-Requested-With": "duoneon" },
+      headers: { "Content-Type": "application/json", "X-Requested-With": "duostrike" },
       body: JSON.stringify(corps),
       cache: "no-store",
     });

@@ -27,7 +27,7 @@ export const NIVEAUX_SKINS = { standard: 1, neon: 3, braise: 5, carbone: 7, arct
 
 export const VISEUR_DEFAUT = { couleur: "#7cffd4", longueur: 7, epaisseur: 2, ecart: 4, point: true, contour: true, dynamique: true };
 
-const CLE = "duoneon-profil";
+const CLE = "duostrike-profil";
 
 function profilVide() {
   return {
@@ -133,7 +133,7 @@ export class Profil {
 }
 
 // ----- Classement en ligne (comptes du site) -----
-const ENTETES = { "X-Requested-With": "duoneon" };
+const ENTETES = { "X-Requested-With": "duostrike" };
 
 export async function etatCompte() {
   try {
@@ -171,7 +171,7 @@ async function appelApi(action, corps = null) {
     });
     const donnees = await r.json().catch(() => ({}));
     return r.ok ? donnees : { erreur: donnees.erreur || "Le serveur ne répond pas (" + r.status + ")." };
-  } catch (e) { return { erreur: "Connexion impossible : le compte ne marche que sur le site Duo Néon en ligne." }; }
+  } catch (e) { return { erreur: "Connexion impossible : le compte ne marche que sur le site Duo Strike en ligne." }; }
 }
 
 export const connexion = (identifiant, mdp) => appelApi("connexion", { identifiant, mdp });

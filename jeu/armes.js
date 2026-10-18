@@ -31,7 +31,7 @@ export const ARMES = {
     bot: { cadence: 0.95, rafale: [1, 1], facteur: 1.0, portee: 10 },
   },
   fusil: {
-    id: "fusil", nom: "DN-7 Vecteur", type: "auto", emplacement: 1, prix: 2900,
+    id: "fusil", nom: "DS-7 Vecteur", type: "auto", emplacement: 1, prix: 2900,
     chargeur: 25, reserve: 75, cadence: 0.1, equipement: 0.75, rechargement: 2.1, rechargementVide: 2.6,
     degats: { tete: 160, corps: 40, jambes: 34 }, chute: null,
     precision: 0.2, mouvement: 3.6, air: 6, serie: 0.13, visee: 0.55, zoom: 1.3, vitesse: 4.4,

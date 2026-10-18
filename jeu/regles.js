@@ -23,7 +23,7 @@ export const DEFIS = {
 
 export const ARTICLES = {
   pompe: { nom: "Briseur", type: "arme", prix: 1800 },
-  fusil: { nom: "DN-7 Vecteur", type: "arme", prix: 2900 },
+  fusil: { nom: "DS-7 Vecteur", type: "arme", prix: 2900 },
   pulsar: { nom: "Pulsar P-07", type: "arme", prix: 3100 },
   sniper: { nom: "Aiguille", type: "arme", prix: 4700 },
   pistolet: { nom: "Sentinelle", type: "arme", prix: 0 },

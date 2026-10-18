@@ -1,4 +1,4 @@
-# Duo Néon — guide
+# Duo Strike — guide
 
 FPS tactique en 3D qui tourne directement dans le navigateur.
 Adresse : https://NOM-DU-COMPTE.alwaysdata.net/jeu/
@@ -6,7 +6,7 @@ Adresse : https://NOM-DU-COMPTE.alwaysdata.net/jeu/
 ## Lancer le jeu
 
 - **En ligne (le plus simple)** : ouvrir https://NOM-DU-COMPTE.alwaysdata.net/jeu/ dans Chrome, Edge ou Firefox.
-- **Sur un PC Windows, même sans Internet** : installer [Node.js](https://nodejs.org) (version LTS), puis double-cliquer sur `LANCER-DUO-NEON.bat` (dans le dossier du jeu ou du ZIP). Le navigateur s'ouvre sur `http://localhost:8080/`. Détails dans `LISEZMOI-WINDOWS.txt`.
+- **Sur un PC Windows, même sans Internet** : installer [Node.js](https://nodejs.org) (version LTS), puis double-cliquer sur `LANCER-DUO-STRIKE.bat` (dans le dossier du jeu ou du ZIP). Le navigateur s'ouvre sur `http://localhost:8080/`. Détails dans `LISEZMOI-WINDOWS.txt`.
 - Ouvrir `index.html` directement (double-clic) ne marche pas : les navigateurs bloquent les modules JavaScript en `file://`.
 
 La bibliothèque 3D (Three.js 0.186.1, licence MIT) est copiée dans `vendor/three/` : aucun CDN n'est nécessaire.
@@ -57,7 +57,7 @@ Les bots sont aussi des personnages : jamais deux fois le même dans une équipe
 | Personnage | Rôle | Difficulté | Arme | C | A (Q) | E (signature) | X (ultime) |
 |---|---|---|---|---|---|---|---|
 | **KAEL** | Fer de lance | ★☆☆ | Pulsar P-07 | Charge à fragmentation | Éclat aveuglant | Propulsion | Assaut total |
-| **VEXA** | Acrobate | ★★★ | DN-7 Vecteur | Saut vectoriel | Voile éclair | Pas de l'ombre | Frénésie |
+| **VEXA** | Acrobate | ★★★ | DS-7 Vecteur | Saut vectoriel | Voile éclair | Pas de l'ombre | Frénésie |
 | **BRAX** | Briseur de lignes | ★☆☆ | Briseur | Grenade sonique | Plaques réactives | Charge du bélier | Onde sismique |
 | **NYRA** | Pyromancienne | ★★☆ | Pulsar P-07 | Cocktail plasma | Fusée éclairante | Cœur ardent | Supernova |
 
@@ -66,25 +66,25 @@ Les bots sont aussi des personnages : jamais deux fois le même dans une équipe
 | Personnage | Rôle | Difficulté | Arme | C | A (Q) | E (signature) | X (ultime) |
 |---|---|---|---|---|---|---|---|
 | **TITAN** | Forteresse | ★☆☆ | Pulsar P-07 | Plaque d'acier | Bouclier déployable | Barrière titan | Rempart vivant |
-| **AEGIS** | Gardienne | ★★☆ | DN-7 Vecteur | Champ réparateur | Pulsion répulsive | Mur des Archives | Égide |
-| **ROKAN** | Ingénieur | ★★☆ | DN-7 Vecteur | Mine sismique | Grenade frag | Tourelle automatique | Barrage d'artillerie |
+| **AEGIS** | Gardienne | ★★☆ | DS-7 Vecteur | Champ réparateur | Pulsion répulsive | Mur des Archives | Égide |
+| **ROKAN** | Ingénieur | ★★☆ | DS-7 Vecteur | Mine sismique | Grenade frag | Tourelle automatique | Barrage d'artillerie |
 | **FROST** | Tireuse cryo | ★★★ | Aiguille | Fil glacé | Grenade givrante | Mur de glace | Blizzard |
 
 ### Reconnaissance — Trouvent les ennemis avant le combat.
 
 | Personnage | Rôle | Difficulté | Arme | C | A (Q) | E (signature) | X (ultime) |
 |---|---|---|---|---|---|---|---|
-| **ECHO** | Sonar vivant | ★★☆ | DN-7 Vecteur | Flèche sonar | Onde de choc | Écoute | Résonance totale |
-| **GHOST** | Infiltrateur | ★★★ | DN-7 Vecteur | Camouflage | Éclipse | Drone furtif | Ombre totale |
+| **ECHO** | Sonar vivant | ★★☆ | DS-7 Vecteur | Flèche sonar | Onde de choc | Écoute | Résonance totale |
+| **GHOST** | Infiltrateur | ★★★ | DS-7 Vecteur | Camouflage | Éclipse | Drone furtif | Ombre totale |
 | **ORION** | Pisteur | ★★☆ | Aiguille | Lyra | Balise traqueuse | Marque du chasseur | Chasse ouverte |
-| **KIRA** | Éclaireuse | ★★☆ | DN-7 Vecteur | Flash ricochet | Lame traqueuse | Pas de lumière | Tempête d'éclats |
+| **KIRA** | Éclaireuse | ★★☆ | DS-7 Vecteur | Flash ricochet | Lame traqueuse | Pas de lumière | Tempête d'éclats |
 
 ### Contrôle — Coupent les lignes de vue et ralentissent l'adversaire.
 
 | Personnage | Rôle | Difficulté | Arme | C | A (Q) | E (signature) | X (ultime) |
 |---|---|---|---|---|---|---|---|
 | **NEXUS** | Gravitationniste | ★★★ | Pulsar P-07 | Puits gravitationnel | Voile du vide | Distorsion | Trou noir |
-| **MIST** | Alchimiste | ★☆☆ | DN-7 Vecteur | Nuage | Brume toxique | Rideau de brume | Brouillard total |
+| **MIST** | Alchimiste | ★☆☆ | DS-7 Vecteur | Nuage | Brume toxique | Rideau de brume | Brouillard total |
 | **VOLT** | Électrocinéticien | ★★☆ | Pulsar P-07 | Grenade IEM | Arc électrique | Ruée électrique | Surcharge |
 | **SABLE** | Nomade des dunes | ★★☆ | Briseur | Tempête de sable | Sables mouvants | Mur de sable | Simoun |
 
@@ -92,9 +92,9 @@ Les bots sont aussi des personnages : jamais deux fois le même dans une équipe
 
 | Personnage | Rôle | Difficulté | Arme | C | A (Q) | E (signature) | X (ultime) |
 |---|---|---|---|---|---|---|---|
-| **SERAPH** | Médecin de guerre | ★☆☆ | DN-7 Vecteur | Orbe de soin | Lueur sacrée | Régénération | Résurrection |
+| **SERAPH** | Médecin de guerre | ★☆☆ | DS-7 Vecteur | Orbe de soin | Lueur sacrée | Régénération | Résurrection |
 | **PULSE** | Rythmicien | ★★☆ | Pulsar P-07 | Stimulant | Onde basse | Battement | Crescendo |
-| **BLOOM** | Botaniste | ★★☆ | DN-7 Vecteur | Spore de soin | Lianes | Peau d'écorce | Jardin sacré |
+| **BLOOM** | Botaniste | ★★☆ | DS-7 Vecteur | Spore de soin | Lianes | Peau d'écorce | Jardin sacré |
 | **ATLAS** | Logisticien | ★☆☆ | Briseur | Caisse de ravitaillement | Fumigène | Bouclier portatif | Renouveau |
 
 ## Capacités
@@ -114,7 +114,7 @@ Les 80 capacités sont décrites par des données (`capacites.js`) et reposent s
 |---|---|---|
 | Sentinelle (pistolet) | gratuit | précis, semi-automatique |
 | Briseur (pompe) | 1800 | énorme de près |
-| DN-7 Vecteur (fusil) | 2900 | automatique, recul à maîtriser |
+| DS-7 Vecteur (fusil) | 2900 | automatique, recul à maîtriser |
 | **Pulsar P-07** (fusil à impulsion) | 3100 | automatique, très stable, écran de munitions sur l'arme, tirs cyan |
 | Aiguille (précision) | 4700 | lunette ×3,6, tue d'un tir à la tête |
 | Lame (couteau) | — | on court plus vite ; un coup dans le dos fait 150 |
@@ -143,7 +143,7 @@ Les bots tournent sur le PC de l'hôte (intelligence, tirs, réapparitions) ; le
 Le jeu essaie d'abord le serveur temps réel (WebSocket, voir plus bas) ; s'il n'est pas lancé, il passe automatiquement par le relais PHP du site (`enligne.php`, ~16 échanges par seconde, un peu plus de latence). Les salons sont gardés dans `donnees/` (inaccessible depuis le web) et effacés quand tout le monde est parti.
 
 ### Avec des amis sur le même Wi-Fi
-1. Sur un PC Windows : lancer `LANCER-DUO-NEON.bat` (Node.js installé). Ailleurs : `node serveur/serveur.js` dans le dossier du jeu.
+1. Sur un PC Windows : lancer `LANCER-DUO-STRIKE.bat` (Node.js installé). Ailleurs : `node serveur/serveur.js` dans le dossier du jeu.
 2. Les autres ouvrent `http://ADRESSE-IP-DU-PC:8080/` (l'adresse IPv4 est affichée dans la fenêtre noire), puis **En ligne**.
 3. Un joueur crée un salon, les autres tapent le code. Adresse du serveur : `ws://ADRESSE-IP-DU-PC:8080/ws`.
 4. Si le pare-feu Windows demande l'autorisation pour Node.js, accepter « Réseaux privés ».

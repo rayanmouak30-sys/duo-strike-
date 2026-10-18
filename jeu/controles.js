@@ -2,9 +2,9 @@
 // et écran tactile. Toutes produisent le même objet "cmd" (déplacement, tir, visée...) et une file d'actions ponctuelles.
 
 const ZONE_MORTE = 0.18;
-const CLE_TOUCHES = "duoneon-touches";
-const CLE_MANETTE = "duoneon-manette";
-const CLE_LIBELLES = "duoneon-libelles";
+const CLE_TOUCHES = "duostrike-touches";
+const CLE_MANETTE = "duostrike-manette";
+const CLE_LIBELLES = "duostrike-libelles";
 
 // Actions du jeu : [identifiant, nom affiché, "maintien" (gardée enfoncée) ou "appui" (une fois), touches par défaut]
 // Les touches sont des positions physiques : KeyW = Z sur un clavier AZERTY.
@@ -200,7 +200,7 @@ export class Controles {
 
   async chargerDisposition() {
     try {
-      const d = localStorage.getItem("duoneon-clavier");
+      const d = localStorage.getItem("duostrike-clavier");
       if (d) this.disposition = d;
     } catch (e) { /* stockage indisponible */ }
     try {
@@ -235,7 +235,7 @@ export class Controles {
       const d = e.key.toLowerCase() === "a" ? "azerty" : e.key.toLowerCase() === "q" ? "qwerty" : null;
       if (d && d !== this.disposition) {
         this.disposition = d;
-        try { localStorage.setItem("duoneon-clavier", d); } catch (err) { /* stockage indisponible */ }
+        try { localStorage.setItem("duostrike-clavier", d); } catch (err) { /* stockage indisponible */ }
         if (this.surDisposition) this.surDisposition();
       }
     }

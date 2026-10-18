@@ -8,7 +8,7 @@ const $ = (id) => document.getElementById(id);
 
 export { ICONES };
 
-const NOMS_ARMES = { couteau: "LAME", pistolet: "SENTINELLE", pompe: "BRISEUR", fusil: "DN-7 VECTEUR", pulsar: "PULSAR P-07", sniper: "AIGUILLE", spike: "SPIKE" };
+const NOMS_ARMES = { couteau: "LAME", pistolet: "SENTINELLE", pompe: "BRISEUR", fusil: "DS-7 VECTEUR", pulsar: "PULSAR P-07", sniper: "AIGUILLE", spike: "SPIKE" };
 
 export class Hud {
   constructor(carte) {

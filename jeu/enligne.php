@@ -1,5 +1,5 @@
 <?php
-// Mode En ligne de Duo Néon sans serveur Node.js : relais par requêtes HTTP (le jeu interroge ~15 fois par seconde).
+// Mode En ligne de Duo Strike sans serveur Node.js : relais par requêtes HTTP (le jeu interroge ~15 fois par seconde).
 // Mêmes messages que jeu/serveur/serveur.js, donc la partie en ligne fonctionne pareil. Les salons sont des fichiers
 // JSON dans donnees/ (interdit d'accès web).
 //
@@ -7,7 +7,7 @@
 // ensemble contre des bots). Les bots tournent chez l'hôte (intelligence, tirs) : il envoie leur position ("bots"),
 // leurs tirs et leurs touches. Les tirs sur un bot sont transmis à l'hôte.
 //
-// POST JSON, en-tête X-Requested-With: duoneon
+// POST JSON, en-tête X-Requested-With: duostrike
 //   {"action":"creer", "v", "nom", "carte", "heros"}                 -> {id, jeton, code, messages}
 //   {"action":"rejoindre", "v", "code", "nom", "heros"}              -> {id, jeton, code, messages} ou {erreur}
 //   {"action":"echange", "code", "id", "jeton", "envois":[...]}      -> {messages, etats} ou {ferme: true}
@@ -35,7 +35,7 @@ function repondre(array $donnees, int $code = 200): void {
     exit;
 }
 
-if (($_SERVER["REQUEST_METHOD"] ?? "") !== "POST" || ($_SERVER["HTTP_X_REQUESTED_WITH"] ?? "") !== "duoneon") {
+if (($_SERVER["REQUEST_METHOD"] ?? "") !== "POST" || ($_SERVER["HTTP_X_REQUESTED_WITH"] ?? "") !== "duostrike") {
     repondre(["erreur" => "Requête refusée."], 403);
 }
 $brut = file_get_contents("php://input", false, null, 0, 65536);

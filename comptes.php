@@ -1,5 +1,5 @@
 <?php
-// Comptes des joueurs de Duo Néon, stockés en JSON dans donnees/ (dossier interdit d'accès web).
+// Comptes des joueurs de Duo Strike, stockés en JSON dans donnees/ (dossier interdit d'accès web).
 
 const DOSSIER_DONNEES = __DIR__ . "/donnees";
 

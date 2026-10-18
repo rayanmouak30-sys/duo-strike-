@@ -3,7 +3,7 @@
 import { HEROS, CATEGORIES, ORDRE_CATEGORIES } from "../jeu/heros.js";
 import { CAPACITES } from "../jeu/capacites.js";
 
-const NOMS_ARMES = { pulsar: "Pulsar P-07", fusil: "DN-7 Vecteur", pompe: "Briseur", sniper: "Aiguille", pistolet: "Sentinelle" };
+const NOMS_ARMES = { pulsar: "Pulsar P-07", fusil: "DS-7 Vecteur", pompe: "Briseur", sniper: "Aiguille", pistolet: "Sentinelle" };
 const TOUCHES = ["C", "A", "E", "X"];
 const pointeurFin = matchMedia("(hover: hover) and (pointer: fine)");
 
@@ -235,7 +235,7 @@ export class Interface {
     try {
       const controle = new AbortController();
       const delai = setTimeout(() => controle.abort(), 8000);
-      const r = await fetch("jeu/api.php?action=classement", { headers: { "X-Requested-With": "duoneon" }, signal: controle.signal });
+      const r = await fetch("jeu/api.php?action=classement", { headers: { "X-Requested-With": "duostrike" }, signal: controle.signal });
       clearTimeout(delai);
       if (!r.ok) throw new Error("HTTP " + r.status);
       const d = await r.json();

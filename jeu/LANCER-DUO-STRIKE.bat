@@ -1,5 +1,5 @@
 @echo off
-title Duo Neon - serveur local
+title Duo Strike - serveur local
 cd /d "%~dp0"
 
 where node >nul 2>nul
@@ -7,7 +7,7 @@ if errorlevel 1 (
   echo.
   echo  Node.js n est pas installe sur ce PC.
   echo  1. Installe la version LTS depuis https://nodejs.org
-  echo  2. Relance ce fichier LANCER-DUO-NEON.bat
+  echo  2. Relance ce fichier LANCER-DUO-STRIKE.bat
   echo.
   start "" "https://nodejs.org"
   pause
@@ -15,7 +15,7 @@ if errorlevel 1 (
 )
 
 echo.
-echo  ===== DUO NEON =====
+echo  ===== DUO STRIKE =====
 echo  Le jeu s ouvre dans ton navigateur : http://localhost:8080/
 echo.
 echo  Jouer a plusieurs sur le meme Wi-Fi :

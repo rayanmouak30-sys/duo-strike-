@@ -1,5 +1,5 @@
 /* ==========================================================================
-   OVERCLASH — site d'accueil
+   DUO STRIKE — site d'accueil
    Direction : noirs profonds, graphite métallique, or brossé.
    ========================================================================== */
 
@@ -198,7 +198,7 @@ main { position: relative; z-index: 10; }
   background: linear-gradient(180deg, #fff6dc 0%, #e9cd8b 38%, #b88a3e 62%, #f2d99a 82%, #8f6a2c 100%);
   -webkit-background-clip: text; background-clip: text;
 }
-.titre-geant .ligne:nth-child(2) > span { padding-left: 0.42em; }
+.titre-geant .ligne:nth-child(2) > span { padding-left: 0.3em; }
 .js .titre-geant .ligne > span { transform: translate3d(0, 105%, 0); transition: transform 1.6s var(--sortie); }
 .js .titre-geant .ligne:nth-child(2) > span { transition-delay: 0.12s; }
 .js .intro-finie .titre-geant .ligne > span { transform: none; }

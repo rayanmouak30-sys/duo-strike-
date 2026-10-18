@@ -1,4 +1,4 @@
-// Duo Néon : rendu adaptatif, boucle à pas fixe, killcam et spectateur, menus, boutique, fin de partie.
+// Duo Strike : rendu adaptatif, boucle à pas fixe, killcam et spectateur, menus, boutique, fin de partie.
 // Les modules : carte (décor), joueur, bots, règles des modes, compétences, interface, sons, musique, profil, réseau.
 import * as THREE from "three";
 import { EffectComposer } from "three/addons/postprocessing/EffectComposer.js";
@@ -39,12 +39,12 @@ const DEFAUTS = {
   difficulte: "normal", mode: "spike", carte: "nexus", heure: "jour", meteo: "clair", allies: true, defi: "libre", serveur: "", carteEnLigne: "nexus", modeEnLigne: "coop", botsEnLigne: 4, difficulteEnLigne: "normal",
 };
 const reglages = { ...DEFAUTS };
-try { Object.assign(reglages, JSON.parse(localStorage.getItem("duoneon-reglages") || "{}")); } catch (e) { /* stockage indisponible */ }
+try { Object.assign(reglages, JSON.parse(localStorage.getItem("duostrike-reglages") || "{}")); } catch (e) { /* stockage indisponible */ }
 if (!["auto", "basse", "moyenne", "haute"].includes(reglages.qualite)) reglages.qualite = "auto";
 if (!MODES[reglages.mode]) reglages.mode = "spike";
 if (!CARTES_JOUABLES.includes(reglages.carte)) reglages.carte = "nexus";
 function sauverReglages() {
-  try { localStorage.setItem("duoneon-reglages", JSON.stringify(reglages)); } catch (e) { /* stockage indisponible */ }
+  try { localStorage.setItem("duostrike-reglages", JSON.stringify(reglages)); } catch (e) { /* stockage indisponible */ }
   if (typeof planifierSauvegarde === "function") planifierSauvegarde();
 }
 
@@ -1347,7 +1347,7 @@ function remplirCarriere() {
   const cl = $("carriere-classement");
   cl.innerHTML = "<p class='astuce'>Chargement…</p>";
   classement().then((r) => {
-    if (!r || !r.joueurs) { cl.innerHTML = "<p class='astuce'>Classement indisponible ici (il fonctionne sur le site Duo Néon en ligne).</p>"; return; }
+    if (!r || !r.joueurs) { cl.innerHTML = "<p class='astuce'>Classement indisponible ici (il fonctionne sur le site Duo Strike en ligne).</p>"; return; }
     cl.innerHTML = "";
     if (!r.joueurs.length) cl.innerHTML = "<p class='astuce'>Personne n'est encore classé : sois le premier !</p>";
     else {
@@ -1737,7 +1737,7 @@ function lierViseur() {
 lierViseur();
 
 // ===== Compte : connexion, création, sauvegarde de la progression sur le serveur =====
-const CLE_SANS_COMPTE = "duoneon-sans-compte";
+const CLE_SANS_COMPTE = "duostrike-sans-compte";
 function connecte() { return !!(profilJ.compte && profilJ.compte.connecte); }
 let minuterieSauvegarde = null;
 let synchroEnCours = false;
@@ -1779,7 +1779,7 @@ async function synchroniserCompte() {
       profilJ.d = distant;
       if (sv.reglages && typeof sv.reglages === "object") {
         for (const [k, v] of Object.entries(sv.reglages)) if (k in DEFAUTS && typeof v === typeof DEFAUTS[k] && !["qualite", "resolutionDynamique", "serveur"].includes(k)) reglages[k] = v;
-        try { localStorage.setItem("duoneon-reglages", JSON.stringify(reglages)); } catch (e) { /* stockage indisponible */ }
+        try { localStorage.setItem("duostrike-reglages", JSON.stringify(reglages)); } catch (e) { /* stockage indisponible */ }
       }
       if (sv.touches || sv.manette) controles.appliquerLiaisons(sv.touches, sv.manette);
       message = `Progression récupérée : niveau ${distant.niveau}.`;

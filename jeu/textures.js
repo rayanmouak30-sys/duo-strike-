@@ -349,7 +349,7 @@ export function textureAnodise(qualite) {
   return { map: versTexture(c), roughnessMap: versTexture(rough.c, false) };
 }
 
-// Marquage gravé de l'arme (logo Duo Néon, numéro de modèle).
+// Marquage gravé de l'arme (logo Duo Strike, numéro de modèle).
 export function textureMarquage(texte, sous) {
   const c = document.createElement("canvas");
   c.width = 256; c.height = 64;

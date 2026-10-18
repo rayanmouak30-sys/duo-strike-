@@ -1,4 +1,4 @@
-DUO NEON - jouer sur un PC Windows
+DUO STRIKE - jouer sur un PC Windows
 =====================================
 
 Le plus simple : jouer en ligne, rien a installer
@@ -7,16 +7,16 @@ Le plus simple : jouer en ligne, rien a installer
 Jouer depuis ce dossier (meme sans Internet)
   1. Installe Node.js (version LTS) : https://nodejs.org
      (une seule fois ; laisse toutes les options par defaut)
-  2. Double-clique sur LANCER-DUO-NEON.bat
+  2. Double-clique sur LANCER-DUO-STRIKE.bat
   3. Le navigateur s'ouvre sur http://localhost:8080/ : c'est parti.
   Pour arreter : ferme la fenetre noire.
 
   Remarque : ouvrir index.html en double-cliquant ne marche pas
   (les navigateurs bloquent les modules du jeu en "file://").
-  Il faut passer par LANCER-DUO-NEON.bat.
+  Il faut passer par LANCER-DUO-STRIKE.bat.
 
 Jouer a plusieurs sur le meme Wi-Fi
-  1. Un seul PC lance LANCER-DUO-NEON.bat.
+  1. Un seul PC lance LANCER-DUO-STRIKE.bat.
   2. La fenetre noire affiche son adresse IPv4 (par exemple 192.168.1.20).
   3. Les amis ouvrent http://192.168.1.20:8080/ dans leur navigateur.
   4. Menu En ligne : un joueur cree un salon, les autres tapent le code.

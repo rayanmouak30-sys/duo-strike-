@@ -1,5 +1,5 @@
 <?php
-// Classement en ligne de Duo Néon, lié aux comptes du site Duo Néon.
+// Classement en ligne de Duo Strike, lié aux comptes du site Duo Strike.
 // GET  ?action=etat        -> joueur connecté ?
 // POST ?action=resultat    -> enregistre le résultat d'une partie (compte connecté obligatoire)
 // GET  ?action=classement  -> les 20 meilleurs joueurs
@@ -19,7 +19,7 @@ function repondre(array $donnees, int $code = 200): void {
 }
 
 // En-tête personnalisé obligatoire : un autre site ne peut pas l'envoyer sans autorisation (protection CSRF).
-if (($_SERVER["HTTP_X_REQUESTED_WITH"] ?? "") !== "duoneon") {
+if (($_SERVER["HTTP_X_REQUESTED_WITH"] ?? "") !== "duostrike") {
     repondre(["erreur" => "Requête refusée."], 403);
 }
 
@@ -31,7 +31,7 @@ if ($action === "etat") {
 }
 
 if ($action === "classement") {
-    $joueurs = lireDonnees("duoneon");
+    $joueurs = lireDonnees("duostrike");
     $liste = [];
     foreach ($joueurs as $j) {
         $liste[] = [
@@ -65,7 +65,7 @@ if ($action === "resultat") {
     $mode = in_array($corps["mode"] ?? "", ["spike", "elimination", "deathmatch"], true) ? $corps["mode"] : null;
     if (!$mode) { repondre(["erreur" => "Mode non classé."], 400); }
 
-    $joueurs = lireDonnees("duoneon");
+    $joueurs = lireDonnees("duostrike");
     $id = $utilisateur["id"];
     $j = $joueurs[$id] ?? ["pseudo" => $utilisateur["pseudo"], "xp" => 0, "niveau" => 1, "parties" => 0, "victoires" => 0, "kills" => 0, "morts" => 0, "tetes" => 0, "dernier" => 0];
     // Une partie dure plusieurs minutes : on refuse les envois trop rapprochés.
@@ -80,22 +80,22 @@ if ($action === "resultat") {
     $j["tetes"] = (int) ($j["tetes"] ?? 0) + $tetes;
     $j["dernier"] = time();
     $joueurs[$id] = $j;
-    ecrireDonnees("duoneon", $joueurs);
+    ecrireDonnees("duostrike", $joueurs);
     repondre(["ok" => true, "xpTotal" => $j["xp"]]);
 }
 
 // ----- Limitation des tentatives (par adresse IP, gardée hachée) -----
 function tentativesRestantes(string $type, int $max, int $fenetre): bool {
-    $cle = $type . ":" . substr(hash("sha256", ($_SERVER["REMOTE_ADDR"] ?? "?") . "duoneon"), 0, 24);
-    $limites = lireDonnees("duoneon_limites");
+    $cle = $type . ":" . substr(hash("sha256", ($_SERVER["REMOTE_ADDR"] ?? "?") . "duostrike"), 0, 24);
+    $limites = lireDonnees("duostrike_limites");
     $maintenant = time();
     $liste = array_values(array_filter($limites[$cle] ?? [], function ($t) use ($maintenant, $fenetre) { return $maintenant - (int) $t < $fenetre; }));
     return count($liste) < $max;
 }
 
 function noterTentative(string $type): void {
-    $cle = $type . ":" . substr(hash("sha256", ($_SERVER["REMOTE_ADDR"] ?? "?") . "duoneon"), 0, 24);
-    $limites = lireDonnees("duoneon_limites");
+    $cle = $type . ":" . substr(hash("sha256", ($_SERVER["REMOTE_ADDR"] ?? "?") . "duostrike"), 0, 24);
+    $limites = lireDonnees("duostrike_limites");
     $maintenant = time();
     // Nettoyage des vieilles entrées (plus d'une heure)
     foreach ($limites as $k => $liste) {
@@ -103,7 +103,7 @@ function noterTentative(string $type): void {
         if (!$limites[$k]) { unset($limites[$k]); }
     }
     $limites[$cle][] = $maintenant;
-    ecrireDonnees("duoneon_limites", $limites);
+    ecrireDonnees("duostrike_limites", $limites);
 }
 
 function lireCorps(): array {
@@ -156,7 +156,7 @@ if ($action === "deconnexion") {
 // ----- Sauvegarde de la progression du jeu (XP, succès, touches, réglages) -----
 if ($action === "profil") {
     if (!$utilisateur) { repondre(["erreur" => "Non connecté."], 401); }
-    $profils = lireDonnees("duoneon_profils");
+    $profils = lireDonnees("duostrike_profils");
     repondre(["sauvegarde" => $profils[$utilisateur["id"]] ?? null]);
 }
 
@@ -169,9 +169,9 @@ if ($action === "sauver") {
         if (isset($corps[$cle]) && is_array($corps[$cle])) { $sauvegarde[$cle] = $corps[$cle]; }
     }
     $sauvegarde["maj"] = time();
-    $profils = lireDonnees("duoneon_profils");
+    $profils = lireDonnees("duostrike_profils");
     $profils[$utilisateur["id"]] = $sauvegarde;
-    ecrireDonnees("duoneon_profils", $profils);
+    ecrireDonnees("duostrike_profils", $profils);
     repondre(["ok" => true]);
 }
 

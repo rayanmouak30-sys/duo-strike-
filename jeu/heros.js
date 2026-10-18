@@ -1,4 +1,4 @@
-// Les 20 personnages jouables de Duo Néon, en 5 catégories de 4.
+// Les 20 personnages jouables de Duo Strike, en 5 catégories de 4.
 // Tout est original : noms imposés, mais histoires, apparences et capacités inventées pour ce jeu.
 // "apparence" décrit le modèle 3D construit par personnages.js ; "capacites" renvoie à capacites.js
 // dans l'ordre des touches : capacité 1 (C), capacité 2 (A sur AZERTY / Q sur QWERTY), signature (E), ultime (X).

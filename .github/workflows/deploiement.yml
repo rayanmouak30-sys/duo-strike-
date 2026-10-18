@@ -1,4 +1,4 @@
-# Met le site OVERCLASH en ligne sur AlwaysData (FTP chiffré) à chaque envoi sur la branche main.
+# Met le site DUO STRIKE en ligne sur AlwaysData (FTP chiffré) à chaque envoi sur la branche main.
 # Les identifiants sont dans les "secrets" du dépôt GitHub, jamais dans le code :
 #   FTP_SERVER   (ex. ftp-NOMDUCOMPTE.alwaysdata.net)
 #   FTP_USERNAME (ex. NOMDUCOMPTE)
@@ -73,7 +73,7 @@ jobs:
             code=$(curl -s -o /dev/null -w "%{http_code}" "$SITE/$page")
             if [ "$code" = "200" ]; then echo "OK  /$page"; else echo "::error::/$page répond $code"; echec=1; fi
           done
-          if curl -s -H "X-Requested-With: duoneon" "$SITE/jeu/api.php?action=classement" | grep -q '"joueurs"'; then
+          if curl -s -H "X-Requested-With: duostrike" "$SITE/jeu/api.php?action=classement" | grep -q '"joueurs"'; then
             echo "OK  jeu/api.php (classement)"
           else
             echo "::error::jeu/api.php ne répond pas correctement (PHP activé ?)"; echec=1
