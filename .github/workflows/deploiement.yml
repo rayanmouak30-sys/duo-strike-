@@ -1,11 +1,15 @@
 # Met le site DUO STRIKE en ligne sur AlwaysData (FTP chiffré) à chaque envoi sur la branche main.
-# Les identifiants sont dans les "secrets" du dépôt GitHub, jamais dans le code :
-#   FTP_SERVER   (ex. ftp-NOMDUCOMPTE.alwaysdata.net)
-#   FTP_USERNAME (ex. NOMDUCOMPTE)
+# Compte AlwaysData "jeu" : serveur, utilisateur et adresse ont des valeurs par défaut ci-dessous.
+# Seul le mot de passe est obligatoire, dans les "secrets" du dépôt GitHub (jamais dans le code) :
 #   FTP_PASSWORD
-#   SITE_URL     (ex. https://NOMDUCOMPTE.alwaysdata.net), pour la vérification après envoi
+# Facultatif (pour changer de compte) : FTP_SERVER, FTP_USERNAME, SITE_URL
 # N'efface jamais rien sur le serveur et ne touche pas au dossier donnees/ (comptes, classement, salons).
 name: Mise en ligne sur AlwaysData
+
+env:
+  FTP_SERVER: ${{ secrets.FTP_SERVER || 'ftp-jeu.alwaysdata.net' }}
+  FTP_USERNAME: ${{ secrets.FTP_USERNAME || 'jeu' }}
+  SITE: ${{ secrets.SITE_URL || 'https://jeu.alwaysdata.net' }}
 
 on:
   push:
@@ -20,13 +24,13 @@ jobs:
   deploiement:
     runs-on: ubuntu-latest
     steps:
-      - name: Vérifier que les identifiants FTP sont configurés
+      - name: Vérifier que le mot de passe FTP est configuré
         id: secrets
         env:
-          FTP_SERVER: ${{ secrets.FTP_SERVER }}
+          FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
         run: |
-          if [ -z "$FTP_SERVER" ]; then
-            echo "Secrets FTP absents : ajoute FTP_SERVER, FTP_USERNAME, FTP_PASSWORD et SITE_URL dans Settings > Secrets and variables > Actions."
+          if [ -z "$FTP_PASSWORD" ]; then
+            echo "::warning::Secret FTP_PASSWORD absent : ajoute-le dans Settings > Secrets and variables > Actions, puis relance ce robot."
             echo "ok=false" >> "$GITHUB_OUTPUT"
           else
             echo "ok=true" >> "$GITHUB_OUTPUT"
@@ -43,8 +47,6 @@ jobs:
       - name: Envoyer les fichiers sur le serveur
         if: steps.secrets.outputs.ok == 'true'
         env:
-          FTP_SERVER: ${{ secrets.FTP_SERVER }}
-          FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
           LFTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
         run: |
           lftp -c "
@@ -63,10 +65,7 @@ jobs:
 
       - name: Vérifier le site en ligne
         if: steps.secrets.outputs.ok == 'true'
-        env:
-          SITE: ${{ secrets.SITE_URL }}
         run: |
-          [ -n "$SITE" ] || { echo "::warning::secret SITE_URL absent : vérification sautée"; exit 0; }
           SITE="${SITE%/}"
           echec=0
           for page in "" jeu/ jeu/vendor/three/build/three.module.js; do

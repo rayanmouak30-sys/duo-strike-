@@ -24,14 +24,10 @@ respect du réglage « réduire les animations », page complète sans WebGL.
 
 Avec PHP installé, dans ce dossier : `php -S localhost:8000` puis ouvrir http://localhost:8000/
 
-## Mise en ligne (AlwaysData)
+## Mise en ligne (AlwaysData, compte « jeu »)
+
+Adresse du site : https://jeu.alwaysdata.net
 
 Chaque envoi sur la branche `main` met le site en ligne automatiquement (`.github/workflows/deploiement.yml`).
-À faire une seule fois, dans GitHub → Settings → Secrets and variables → Actions → New repository secret :
-
-| Secret | Valeur |
-|---|---|
-| `FTP_SERVER` | `ftp-NOMDUCOMPTE.alwaysdata.net` |
-| `FTP_USERNAME` | nom d'utilisateur FTP AlwaysData |
-| `FTP_PASSWORD` | mot de passe FTP AlwaysData |
-| `SITE_URL` | `https://NOMDUCOMPTE.alwaysdata.net` |
+À faire une seule fois : GitHub → Settings → Secrets and variables → Actions → New repository secret,
+nom `FTP_PASSWORD`, valeur = mot de passe FTP AlwaysData.
