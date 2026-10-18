@@ -4,14 +4,23 @@
 // dans l'ordre des touches : capacité 1 (C), capacité 2 (A sur AZERTY / Q sur QWERTY), signature (E), ultime (X).
 
 export const CATEGORIES = {
-  assaut: { id: "assaut", nom: "Assaut", couleur: "#ff6a4d", texte: "Entrent les premiers et gagnent les duels." },
-  defense: { id: "defense", nom: "Défense", couleur: "#4f9dff", texte: "Tiennent une zone et protègent l'équipe." },
-  reconnaissance: { id: "reconnaissance", nom: "Reconnaissance", couleur: "#ffc845", texte: "Trouvent les ennemis avant le combat." },
-  controle: { id: "controle", nom: "Contrôle", couleur: "#b07cff", texte: "Coupent les lignes de vue et ralentissent l'adversaire." },
-  soutien: { id: "soutien", nom: "Soutien", couleur: "#4fe39a", texte: "Soignent, protègent et ravitaillent." },
+  // symbole : pictogramme SVG 24×24 (reconnaissable sans la couleur)
+  assaut: { id: "assaut", nom: "Assaut", couleur: "#ff6a4d", texte: "Engagent les combats, prennent les positions et mettent la pression.",
+    symbole: "M12 2l8 10h-5v10H9V12H4z" },
+  controle: { id: "controle", nom: "Contrôle", couleur: "#b07cff", texte: "Créent des zones, coupent les lignes de vue et ralentissent l'adversaire.",
+    symbole: "M12 2l10 10-10 10L2 12zm0 5l-5 5 5 5 5-5z" },
+  initiation: { id: "initiation", nom: "Initiation", couleur: "#ffc845", texte: "Recueillent l'information et ouvrent la voie avant l'engagement.",
+    symbole: "M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12zm11-4a4 4 0 100 8 4 4 0 000-8z" },
+  sentinelle: { id: "sentinelle", nom: "Sentinelle", couleur: "#4f9dff", texte: "Défendent les positions, sécurisent les passages et détectent les intrus.",
+    symbole: "M12 1l9 3.5V11c0 5.5-3.8 10-9 12-5.2-2-9-6.5-9-12V4.5z" },
+  soutien: { id: "soutien", nom: "Soutien", couleur: "#4fe39a", texte: "Soignent, protègent et ravitaillent l'équipe, sans la rendre invincible.",
+    symbole: "M9 2h6v7h7v6h-7v7H9v-7H2V9h7z" },
 };
 
-export const ORDRE_CATEGORIES = ["assaut", "defense", "reconnaissance", "controle", "soutien"];
+export const ORDRE_CATEGORIES = ["assaut", "controle", "initiation", "sentinelle", "soutien"];
+
+// Pictogramme d'une catégorie (SVG en ligne)
+export const symboleCategorie = (id) => `<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" fill-rule="evenodd" d="${CATEGORIES[id].symbole}"/></svg>`;
 
 export const HEROS = {
   // ===================== ASSAUT =====================
@@ -68,9 +77,9 @@ export const HEROS = {
     },
   },
 
-  // ===================== DÉFENSE =====================
+  // ===================== SENTINELLE =====================
   titan: {
-    id: "titan", nom: "TITAN", categorie: "defense", role: "Forteresse", difficulte: 1, arme: "pulsar", pose: "garde",
+    id: "titan", nom: "TITAN", categorie: "sentinelle", role: "Forteresse", difficulte: 1, arme: "pulsar", pose: "garde",
     histoire: "Sous les 140 kg d'armure se trouve Matéo Ruiz, ancien pompier des tours de Port-Ciel. Le jour où une tour s'est effondrée, il a tenu une poutre pendant neuf minutes. Il a juré que personne ne tomberait plus derrière lui.",
     personnalite: "Calme, patient, parle peu. Ses blagues arrivent toujours trois secondes trop tard.",
     citation: "Derrière moi.",
@@ -82,7 +91,7 @@ export const HEROS = {
     },
   },
   aegis: {
-    id: "aegis", nom: "AEGIS", categorie: "defense", role: "Gardienne", difficulte: 2, arme: "fusil", pose: "garde",
+    id: "aegis", nom: "AEGIS", categorie: "sentinelle", role: "Gardienne", difficulte: 2, arme: "fusil", pose: "garde",
     histoire: "Capitaine de la garde des Archives de Verre, Aegis a protégé la dernière bibliothèque libre du continent pendant le Long Hiver. Son mur d'énergie est fabriqué à partir des boucliers de la bibliothèque.",
     personnalite: "Posée, exigeante, très attachée aux règles… qu'elle applique surtout aux autres.",
     citation: "Personne ne passe.",
@@ -95,7 +104,7 @@ export const HEROS = {
     },
   },
   rokan: {
-    id: "rokan", nom: "ROKAN", categorie: "defense", role: "Ingénieur", difficulte: 2, arme: "fusil", pose: "inspection",
+    id: "rokan", nom: "ROKAN", categorie: "sentinelle", role: "Ingénieur", difficulte: 2, arme: "fusil", pose: "inspection",
     histoire: "Mécanicien de la flotte minière d'Hadès, Rokan construit ses tourelles avec des pièces récupérées sur les épaves. Chacune porte le nom d'un ami perdu dans les mines.",
     personnalite: "Bougon, méthodique, ne fait confiance qu'à ce qu'il a soudé lui-même.",
     citation: "Ma tourelle s'en occupe.",
@@ -108,7 +117,7 @@ export const HEROS = {
     },
   },
   frost: {
-    id: "frost", nom: "FROST", categorie: "defense", role: "Tireuse cryo", difficulte: 3, arme: "sniper", pose: "pret",
+    id: "frost", nom: "FROST", categorie: "sentinelle", role: "Tireuse cryo", difficulte: 3, arme: "sniper", pose: "pret",
     histoire: "Seule survivante de la station polaire Borée, Frost a appris à tirer par moins soixante degrés. Ses projectiles cryogéniques viennent du cœur de la station qu'elle a refusé d'abandonner.",
     personnalite: "Froide en apparence, d'une loyauté absolue. N'oublie jamais un anniversaire.",
     citation: "Restez au chaud.",
@@ -121,9 +130,9 @@ export const HEROS = {
     },
   },
 
-  // ===================== RECONNAISSANCE =====================
+  // ===================== INITIATION =====================
   echo: {
-    id: "echo", nom: "ECHO", categorie: "reconnaissance", role: "Sonar vivant", difficulte: 2, arme: "fusil", pose: "decontracte",
+    id: "echo", nom: "ECHO", categorie: "initiation", role: "Sonar vivant", difficulte: 2, arme: "fusil", pose: "decontracte",
     histoire: "Ancien ingénieur du son des clubs souterrains, Echo entend des pas à travers trois murs. Sa flèche sonar est une enceinte miniaturisée qu'il a bricolée lui-même.",
     personnalite: "Bavard, curieux, fredonne sans arrêt. Silencieux comme une tombe en mission.",
     citation: "Je les entends.",
@@ -136,7 +145,7 @@ export const HEROS = {
     },
   },
   ghost: {
-    id: "ghost", nom: "GHOST", categorie: "reconnaissance", role: "Infiltrateur", difficulte: 3, arme: "fusil", pose: "pret",
+    id: "ghost", nom: "GHOST", categorie: "initiation", role: "Infiltrateur", difficulte: 3, arme: "fusil", pose: "pret",
     histoire: "Personne ne connaît son vrai nom. Ghost est apparu dans les fichiers de l'agence le jour où il les a piratés. Sa combinaison à réfraction optique est un prototype qu'il a lui-même dérobé.",
     personnalite: "Laconique, ironique, toujours une longueur d'avance — ou c'est ce qu'il laisse croire.",
     citation: "Vous ne m'avez pas vu.",
@@ -149,7 +158,7 @@ export const HEROS = {
     },
   },
   orion: {
-    id: "orion", nom: "ORION", categorie: "reconnaissance", role: "Pisteur", difficulte: 2, arme: "sniper", pose: "epaule",
+    id: "orion", nom: "ORION", categorie: "initiation", role: "Pisteur", difficulte: 2, arme: "sniper", pose: "epaule",
     histoire: "Guide de chasse dans les forêts mortes de l'Ancien Continent, Orion piste ses cibles avec Lyra, son drone de reconnaissance. Il ne tire jamais deux fois.",
     personnalite: "Patient, observateur, parle à son drone comme à un vieux chien.",
     citation: "Lyra, cherche.",
@@ -162,7 +171,7 @@ export const HEROS = {
     },
   },
   kira: {
-    id: "kira", nom: "KIRA", categorie: "reconnaissance", role: "Éclaireuse", difficulte: 2, arme: "fusil", pose: "pret",
+    id: "kira", nom: "KIRA", categorie: "initiation", role: "Éclaireuse", difficulte: 2, arme: "fusil", pose: "pret",
     histoire: "Messagère la plus rapide du réseau clandestin de Sendai-Bas, Kira n'a jamais perdu un colis. Ses lames traqueuses transmettent ce qu'elles voient avant même de toucher le sol.",
     personnalite: "Énergique, compétitive, se lance des défis à elle-même en plein combat.",
     citation: "Déjà là !",

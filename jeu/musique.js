@@ -33,7 +33,7 @@ export class Musique {
     if (!ctx || this.gains) return;
     this.sortie = ctx.createGain();
     this.sortie.gain.value = this.volume * 0.5;
-    this.sortie.connect(this.audio.maitre);
+    this.sortie.connect(this.audio.general);
     this.gains = {};
     for (const k of ["nappe", "basse", "kick", "caisse", "charley", "arpege"]) {
       const g = ctx.createGain();

@@ -135,6 +135,8 @@ export class VueArme {
     this.coupSens = 1;
     this.cycleEjecte = false;
     this.inspectT = 1;
+    this.airK = 0;
+    this.rangement = null;
   }
 
   redimensionner(ratio) {
@@ -181,7 +183,23 @@ export class VueArme {
     const cle = id + "|" + skin;
     if (!this.cache.has(cle)) this.cache.set(cle, this.construireModele(id, skin));
     const m = this.cache.get(cle);
-    if (this.modele && this.modele !== m) this.modele.racine.visible = false;
+    // L'arme en main est d'abord rangée (vers le bas), la nouvelle sort ensuite : la durée totale reste celle du jeu
+    const ancien = this.rangement ? this.rangement.ancien : this.modele;
+    if (ancien && ancien !== m && ancien.racine.visible && duree > 0.3 && this.sortie <= 0.5) {
+      this.rangement = { ancien, suivant: m, t: 0, duree: 0.15, dureeSortie: duree - 0.15 };
+      this.modele = ancien;
+      this.coupT = 1;
+      this.inspectT = 1;
+      return;
+    }
+    this.rangement = null;
+    this.activer(m, duree);
+  }
+
+  // Rend un modèle actif et lance son animation de sortie
+  activer(m, duree) {
+    const id = m.id, skin = m.skin;
+    for (const autre of this.cache.values()) if (autre !== m) autre.racine.visible = false;
     this.modele = m;
     m.racine.visible = true;
     m.groupe.add(this.flash);
@@ -256,13 +274,19 @@ export class VueArme {
 
   // e : { dt, temps, vitesse, auSol, vise, sprint, souris:{x,y}, recharge (0..1 ou -1), rechargeVide, cycle (0..1 ou -1), dureeCoup }
   maj(e) {
+    const dt = e.dt;
+    if (this.rangement) {
+      const r = this.rangement;
+      r.t += dt;
+      if (r.t >= r.duree) { this.rangement = null; this.activer(r.suivant, r.dureeSortie); }
+      else this.sortie = r.t / r.duree;   // l'animation de sortie jouée à l'envers
+    }
     const m = this.modele;
     if (!m) return;
-    const dt = e.dt;
     const id = m.id;
     this.viseeK += ((e.vise ? 1 : 0) - this.viseeK) * (1 - Math.exp(-(id === "sniper" ? 12 : 15) * dt));
     this.sprintK += ((e.sprint && !e.vise ? 1 : 0) - this.sprintK) * (1 - Math.exp(-9 * dt));
-    this.sortie = Math.max(0, this.sortie - dt / this.dureeSortie);
+    if (!this.rangement) this.sortie = Math.max(0, this.sortie - dt / this.dureeSortie);
     const sortie = this.sortie * this.sortie;
 
     const rz = this.ressortZ.maj(dt), rrx = this.ressortRx.maj(dt), rrz = this.ressortRz.maj(dt), ry = this.ressortY.maj(dt);
@@ -289,12 +313,16 @@ export class VueArme {
     const bobX = Math.sin(this.pas * 0.5) * 0.011 * amp;
     const bobY = -Math.abs(Math.cos(this.pas * 0.5)) * 0.012 * amp;
     const respiration = Math.sin(e.temps * 1.5) * 0.0018 * (1 - this.viseeK * 0.8);
+    // En l'air : l'arme suit la vitesse verticale (monte à l'impulsion, traîne à la descente) ; choc à l'atterrissage
+    const air = e.auSol ? 0 : Math.max(-1, Math.min(1, (e.vy || 0) / 7));
+    this.airK += (air - this.airK) * (1 - Math.exp(-10 * dt));
+    if (e.atterrissage > 0) this.ressortY.impulsion(-e.atterrissage * 9 * this.amplitudeBob);
 
     this.pivot.position.lerpVectors(m.hanche, m.visee, this.viseeK);
     this.pivot.position.x += bobX + this.balance.x * 0.025 * (1 - this.viseeK * 0.7) - this.sprintK * 0.02;
-    this.pivot.position.y += bobY + respiration + this.balance.y * 0.018 * (1 - this.viseeK * 0.7) - sortie * 0.3 - this.sprintK * 0.04;
+    this.pivot.position.y += bobY + respiration + this.balance.y * 0.018 * (1 - this.viseeK * 0.7) - sortie * 0.3 - this.sprintK * 0.04 - this.airK * 0.018 * (1 - this.viseeK * 0.7) * this.amplitudeBob;
     this.pivot.rotation.set(
-      this.balance.y * 0.06 - this.sprintK * 0.32 + sortie * 0.9,
+      this.balance.y * 0.06 - this.sprintK * 0.32 + sortie * 0.9 + this.airK * 0.05 * (1 - this.viseeK) * this.amplitudeBob,
       this.balance.x * 0.1 + this.sprintK * 0.62,
       this.balance.x * 0.08 + this.sprintK * 0.32 + bobX * 2 + (id === "couteau" ? sortie * 2.4 : 0)
     );

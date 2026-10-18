@@ -208,7 +208,7 @@ export class Joueur {
     const solY = monde.hauteurSol(this.pos.x, this.pos.z, avantY);
     const etaitEnLAir = !this.auSol;
     if (this.pos.y <= solY) {
-      if (etaitEnLAir && this.vel.y < -4) { this.chute = Math.min(1, -this.vel.y / 9); jeu.audio.pasJoueur(1.4); }
+      if (etaitEnLAir && this.vel.y < -4) { this.chute = Math.min(1, -this.vel.y / 9); this.atterrissage = this.chute; jeu.audio.pasJoueur(1.4); }
       this.pos.y = solY;
       this.vel.y = 0;
       this.auSol = true;

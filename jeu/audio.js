@@ -1,6 +1,12 @@
 // Sons synthétisés en direct (aucun fichier audio). Les sons des bots sont spatialisés :
 // on entend de quel côté ils tirent ou marchent.
 
+// Familles de sons (réglage de volume séparé) ; tous les autres sons sont des « effets »
+const FAMILLES_SONS = {
+  armes: ["tirJoueur", "tirBot", "cliquetis", "rechargement", "vide", "equiper", "couteau"],
+  interface: ["clic", "survol", "achat", "refus", "touche", "elimination", "annonce"],
+};
+
 export class Audio {
   constructor() {
     this.ctx = null;
@@ -8,6 +14,18 @@ export class Audio {
     this.volumeAmbiance = 0.5;
     this.derniers = {};
     this.annonceur = true;
+    this.volumes = { armes: 1, effets: 1, interface: 1 };
+    this.famille = null;
+    for (const [cat, noms] of Object.entries(FAMILLES_SONS)) {
+      for (const nom of noms) {
+        const original = this[nom].bind(this);
+        this[nom] = (...args) => {
+          const avant = this.famille;
+          this.famille = cat;
+          try { return original(...args); } finally { this.famille = avant; }
+        };
+      }
+    }
   }
 
   // Évite d'empiler le même son plusieurs fois dans un temps très court.
@@ -26,12 +44,20 @@ export class Audio {
     const AC = window.AudioContext || window.webkitAudioContext;
     if (!AC) return;
     this.ctx = new AC();
-    this.maitre = this.ctx.createGain();
-    this.maitre.gain.value = this.volume;
+    this.general = this.ctx.createGain();
+    this.general.gain.value = this.volume;
     const comp = this.ctx.createDynamicsCompressor();
     comp.threshold.value = -14;
     comp.ratio.value = 4;
-    this.maitre.connect(comp).connect(this.ctx.destination);
+    this.general.connect(comp).connect(this.ctx.destination);
+    // Un canal par famille de sons (armes, effets, interface), chacun avec son volume
+    this.bus = {};
+    for (const cat of ["armes", "effets", "interface"]) {
+      const g = this.ctx.createGain();
+      g.gain.value = this.volumes[cat];
+      g.connect(this.general);
+      this.bus[cat] = g;
+    }
 
     const n = this.ctx.sampleRate;
     this.bruit = this.ctx.createBuffer(1, n, n);
@@ -49,7 +75,7 @@ export class Audio {
     this.reverb.buffer = ir;
     this.envoiReverb = this.ctx.createGain();
     this.envoiReverb.gain.value = 0.22;
-    this.envoiReverb.connect(this.reverb).connect(this.maitre);
+    this.envoiReverb.connect(this.reverb).connect(this.general);
     this.lancerAmbiance();
   }
 
@@ -58,7 +84,7 @@ export class Audio {
     const ctx = this.ctx;
     this.gainAmbiance = ctx.createGain();
     this.gainAmbiance.gain.value = this.volumeAmbiance * 0.35;
-    this.gainAmbiance.connect(this.maitre);
+    this.gainAmbiance.connect(this.general);
     const vent = ctx.createBufferSource();
     vent.buffer = this.bruit;
     vent.loop = true;
@@ -83,6 +109,14 @@ export class Audio {
       o.connect(g).connect(this.gainAmbiance);
       o.start();
     }
+  }
+
+  // Canal de sortie des sons : celui de la famille en cours (voir FAMILLES_SONS), sinon « effets »
+  get maitre() { return this.bus ? this.bus[this.famille] || this.bus.effets : null; }
+
+  reglerFamille(cat, v) {
+    this.volumes[cat] = v;
+    if (this.bus && this.bus[cat]) this.bus[cat].gain.value = v;
   }
 
   reglerAmbiance(v) {
@@ -122,7 +156,7 @@ export class Audio {
 
   reglerVolume(v) {
     this.volume = v;
-    if (this.maitre) this.maitre.gain.value = v;
+    if (this.general) this.general.gain.value = v;
   }
 
   // Position et orientation de l'auditeur (la caméra).

@@ -156,6 +156,7 @@ export class Effets {
   }
 
   etincellesEn(p, n, couleur, nombre = 9) {
+    nombre = Math.max(1, Math.round(nombre * (this.densite ?? 1)));   // réglage « Effets visuels »
     const pos = this.geoEtincelles.attributes.position, col = this.geoEtincelles.attributes.color;
     for (let k = 0; k < nombre; k++) {
       const i = this.iEtincelle++ % this.maxEtincelles;

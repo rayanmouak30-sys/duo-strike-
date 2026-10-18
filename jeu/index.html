@@ -344,8 +344,9 @@
         <input type="range" id="r-sensibiliteManette" min="0.3" max="2.5" step="0.05">
         <label for="r-fov">Champ de vision <output id="o-fov"></output></label>
         <input type="range" id="r-fov" min="80" max="110" step="1">
-        <label for="r-bob">Balancement de la caméra <output id="o-bob"></output></label>
+        <label for="r-bob">Balancement de la caméra et de l'arme <output id="o-bob"></output></label>
         <input type="range" id="r-bob" min="0" max="1" step="0.05">
+        <label class="case"><input type="checkbox" id="r-inverserY"> Inverser l'axe vertical</label>
         <h3>Son</h3>
         <label for="r-volume">Volume général <output id="o-volume"></output></label>
         <input type="range" id="r-volume" min="0" max="1" step="0.05">
@@ -353,6 +354,12 @@
         <input type="range" id="r-musique" min="0" max="1" step="0.05">
         <label for="r-ambiance">Ambiance de l'arène <output id="o-ambiance"></output></label>
         <input type="range" id="r-ambiance" min="0" max="1" step="0.05">
+        <label for="r-volumeArmes">Armes <output id="o-volumeArmes"></output></label>
+        <input type="range" id="r-volumeArmes" min="0" max="1" step="0.05">
+        <label for="r-volumeEffets">Effets et capacités <output id="o-volumeEffets"></output></label>
+        <input type="range" id="r-volumeEffets" min="0" max="1" step="0.05">
+        <label for="r-volumeInterface">Interface <output id="o-volumeInterface"></output></label>
+        <input type="range" id="r-volumeInterface" min="0" max="1" step="0.05">
         <label class="case"><input type="checkbox" id="r-annonceur"> Annonceur vocal</label>
       </div>
       <div>
@@ -369,7 +376,19 @@
         <label for="r-luminosite">Luminosité <output id="o-luminosite"></output></label>
         <input type="range" id="r-luminosite" min="0.7" max="1.6" step="0.05">
         <label class="case"><input type="checkbox" id="r-fps"> Afficher les FPS</label>
+        <label for="r-ombres">Ombres</label>
+        <select id="r-ombres">
+          <option value="auto">Selon la qualité graphique</option>
+          <option value="aucune">Désactivées (plus fluide)</option>
+        </select>
+        <label for="r-effets">Effets visuels (étincelles, impacts)</label>
+        <select id="r-effets">
+          <option value="complets">Complets</option>
+          <option value="reduits">Réduits (plus fluide, plus lisible)</option>
+        </select>
+        <label class="case"><input type="checkbox" id="r-minimap"> Afficher la mini-carte</label>
         <button type="button" class="bouton-secondaire" id="r-plein-ecran">Passer en plein écran</button>
+        <button type="button" class="bouton-secondaire" id="r-reinitialiser">Réinitialiser tous les paramètres</button>
         <h3>Viseur</h3>
         <div class="apercu-viseur"><div id="apercu-viseur"><i></i><i></i><i></i><i></i><b></b></div></div>
         <label for="v-couleur">Couleur <input type="color" id="v-couleur"></label>

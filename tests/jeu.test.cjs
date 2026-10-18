@@ -159,7 +159,7 @@ async function principal() {
         for (const arme of ["pulsar", "fusil", "sniper", "pompe", "pistolet", "couteau"]) {
           const vus = new Map();
           for (const skin of Object.keys(SKINS_ARMES)) {
-            vue.equiper(arme, skin);
+            vue.equiper(arme, skin, 0);
             const m = vue.modele;
             if (!m || m.id !== arme || m.skin !== skin) { problemes.push(`${arme}/${skin} : modèle absent`); continue; }
             const mats = signature(m);
@@ -170,7 +170,7 @@ async function principal() {
             if (SKINS_ARMES[skin].ornement && !m.groupe.getObjectByName("ornement")) problemes.push(`${arme}/${skin} : ornement absent`);
           }
         }
-        vue.equiper("pistolet", "standard");
+        vue.equiper("pistolet", "standard", 0);
         return problemes;
       });
       verifier(r.length === 0, r.slice(0, 12).join("\n"));
@@ -328,6 +328,63 @@ async function principal() {
       verifier(r.pendantSortie === r.avant, "tir pendant la sortie de l'arme");
       verifier(r.apres < r.avant, "pas de tir une fois l'arme sortie");
       verifier(r.vues === 1, r.vues + " modèles d'arme affichés en même temps");
+    });
+
+    await test("Vue FPS : l'ancienne arme est rangée avant la sortie de la nouvelle", async () => {
+      const r = await ev(() => {
+        const n = window.__neon, j = n.joueur;
+        j.equiper("pistolet", true); n.avancer(1.2);
+        n.controles.actions.push("arme3"); n.avancer(0.05);
+        const pendant = { modele: n.vue.modele.id, rangement: !!n.vue.rangement, visibles: n.vue.arme.children.filter((o) => o.visible).length };
+        n.avancer(0.3);
+        const apres = { modele: n.vue.modele.id, rangement: !!n.vue.rangement };
+        n.controles.actions.push("arme2"); n.avancer(1.2);
+        return { pendant, apres };
+      });
+      verifier(r.pendant.rangement && r.pendant.modele === "pistolet", "pas de phase de rangement : " + JSON.stringify(r.pendant));
+      verifier(r.pendant.visibles === 1, r.pendant.visibles + " armes visibles pendant le rangement");
+      verifier(!r.apres.rangement && r.apres.modele === "couteau", "la nouvelle arme n'est pas sortie : " + JSON.stringify(r.apres));
+    });
+
+    await test("Vue FPS : saut et atterrissage animent l'arme et la caméra", async () => {
+      const r = await ev(() => {
+        const n = window.__neon, j = n.joueur, c = n.controles.cmd;
+        let enLAir = false, airMax = 0, choc = false;
+        c.saut = true;
+        for (let i = 0; i < 90; i++) {
+          n.avancer(1 / 60);
+          c.saut = false;
+          if (!j.auSol) enLAir = true;
+          airMax = Math.max(airMax, Math.abs(n.vue.airK));
+          if (j.chute > 0.05) choc = true;
+        }
+        return { enLAir, airMax, choc, auSol: j.auSol };
+      });
+      verifier(r.enLAir && r.auSol, "le saut ne décolle pas ou ne retombe pas");
+      verifier(r.airMax > 0.1, "l'arme ne réagit pas au saut (" + r.airMax.toFixed(3) + ")");
+    });
+
+    await test("Paramètres : inversion, volumes, ombres, effets, mini-carte et réinitialisation", async () => {
+      const r = await ev(() => {
+        const n = window.__neon, j = n.joueur, $ = (id) => document.getElementById(id);
+        const regler = (id, v) => { const el = $(id); if (el.type === "checkbox") { el.checked = v; el.dispatchEvent(new Event("change")); } else { el.value = v; el.dispatchEvent(new Event(el.tagName === "SELECT" ? "change" : "input")); } };
+        const res = {};
+        const t0 = j.tangage; n.controles.regard.dy = 40; n.avancer(1 / 60); const normal = j.tangage - t0;
+        regler("r-inverserY", true);
+        const t1 = j.tangage; n.controles.regard.dy = 40; n.avancer(1 / 60); const inverse = j.tangage - t1;
+        res.inversion = Math.sign(normal) === -Math.sign(inverse) && normal !== 0;
+        regler("r-volumeArmes", 0.3);
+        const bus = n.jeu.audio.bus;
+        res.volume = !bus || Math.abs(bus.armes.gain.value - 0.3) < 1e-6;
+        res.audioActif = !!bus;
+        regler("r-ombres", "aucune"); res.ombres = n.renderer.shadowMap.enabled === false;
+        regler("r-effets", "reduits"); res.effets = n.effets.densite === 0.4;
+        regler("r-minimap", false); res.minimap = $("minimap").hidden === true;
+        $("r-reinitialiser").click();
+        res.reinit = n.reglages.inverserY === false && n.reglages.volumeArmes === 1 && n.reglages.ombres === "auto" && n.effets.densite === 1 && $("minimap").hidden === false && $("r-inverserY").checked === false;
+        return res;
+      });
+      for (const [k, v] of Object.entries(r)) if (k !== "audioActif") verifier(v, "réglage sans effet : " + k + " " + JSON.stringify(r));
     });
 
     await test("Bots : ils se déplacent et n'ont pas de position invalide (60 s simulées)", async () => {

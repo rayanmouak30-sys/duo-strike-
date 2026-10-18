@@ -61,7 +61,7 @@ Les bots sont aussi des personnages : jamais deux fois le même dans une équipe
 | **BRAX** | Briseur de lignes | ★☆☆ | Briseur | Grenade sonique | Plaques réactives | Charge du bélier | Onde sismique |
 | **NYRA** | Pyromancienne | ★★☆ | Pulsar P-07 | Cocktail plasma | Fusée éclairante | Cœur ardent | Supernova |
 
-### Défense — Tiennent une zone et protègent l'équipe.
+### Sentinelle — Défendent les positions, sécurisent les passages et détectent les intrus.
 
 | Personnage | Rôle | Difficulté | Arme | C | A (Q) | E (signature) | X (ultime) |
 |---|---|---|---|---|---|---|---|
@@ -70,7 +70,7 @@ Les bots sont aussi des personnages : jamais deux fois le même dans une équipe
 | **ROKAN** | Ingénieur | ★★☆ | DS-7 Vecteur | Mine sismique | Grenade frag | Tourelle automatique | Barrage d'artillerie |
 | **FROST** | Tireuse cryo | ★★★ | Aiguille | Fil glacé | Grenade givrante | Mur de glace | Blizzard |
 
-### Reconnaissance — Trouvent les ennemis avant le combat.
+### Initiation — Recueillent l'information et ouvrent la voie avant l'engagement.
 
 | Personnage | Rôle | Difficulté | Arme | C | A (Q) | E (signature) | X (ultime) |
 |---|---|---|---|---|---|---|---|

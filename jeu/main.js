@@ -20,7 +20,7 @@ import { Musique } from "./musique.js";
 import { Effets } from "./effets.js";
 import { Competences } from "./competences.js";
 import { CAPACITES, FAMILLES_PERSONNELLES, detailsCapacite, iconeCapacite } from "./capacites.js";
-import { HEROS, CATEGORIES, LISTE_HEROS, ORDRE_CATEGORIES, herosValide, NOMS_DIFFICULTE } from "./heros.js";
+import { HEROS, CATEGORIES, LISTE_HEROS, ORDRE_CATEGORIES, herosValide, NOMS_DIFFICULTE, symboleCategorie } from "./heros.js";
 import { Vitrine } from "./vitrine.js";
 import { Joueur, nouvellesStats } from "./joueur.js";
 import { Regles, MODES, DEFIS, ARTICLES, OBJECTIF_DM } from "./regles.js";
@@ -36,6 +36,7 @@ const TEST = new URLSearchParams(location.search).has("test");
 // ===== Réglages (gardés dans ce navigateur) =====
 const DEFAUTS = {
   sensibilite: 1, sensibiliteManette: 1, fov: 103, volume: 0.7, musique: 0.45, ambiance: 0.5, annonceur: true, bob: 1,
+  inverserY: false, volumeArmes: 1, volumeEffets: 1, volumeInterface: 1, ombres: "auto", effets: "complets", minimap: true,
   qualite: "auto", resolutionDynamique: true, luminosite: 1, fps: false,
   difficulte: "normal", mode: "spike", carte: "nexus", heure: "jour", meteo: "clair", allies: true, defi: "libre", serveur: "", carteEnLigne: "nexus", modeEnLigne: "coop", botsEnLigne: 4, difficulteEnLigne: "normal",
 };
@@ -756,7 +757,7 @@ function majCamera(dt, alpha) {
     const k = 0.0021 * reglages.sensibilite * (joueur.visee ? 0.78 : 1) / Math.pow(zoomActuel, 0.75);
     if (!boutiqueOuverte && partie.etat === "jeu") {
       joueur.lacet -= regard.dx * k;
-      joueur.tangage = Math.max(-1.5, Math.min(1.5, joueur.tangage - regard.dy * k));
+      joueur.tangage = Math.max(-1.5, Math.min(1.5, joueur.tangage - regard.dy * k * (reglages.inverserY ? -1 : 1)));
     }
     const amp = reglages.bob * (1 - vue.viseeK * 0.75);
     const balancement = joueur.auSol ? Math.sin(temps * (joueur.sprint ? 13 : 10)) * 0.022 * Math.min(vit / 6, 1) * amp : 0;
@@ -798,9 +799,10 @@ function majCamera(dt, alpha) {
 
   vue.amplitudeBob = reglages.bob;
   vue.maj({
-    dt, temps, vitesse: vit, auSol: joueur.auSol, vise: joueur.visee, sprint: joueur.sprint && vit > 4,
+    dt, temps, vitesse: vit, auSol: joueur.auSol, vise: joueur.visee, sprint: joueur.sprint && vit > 4, vy: joueur.vel.y, atterrissage: joueur.atterrissage || 0,
     souris: { x: regard.dx, y: regard.dy }, recharge: L.progressionRecharge, rechargeVide: L.rechargeVide, cycle: L.progressionCycle, mun: L.mun,
   });
+  joueur.atterrissage = 0;   // choc d'atterrissage transmis une seule fois à l'arme
   audio.ecouteur(camera.position.x, camera.position.y, camera.position.z, -s, 0, -c);
   return { zoom, armeVisible: true };
 }
@@ -1199,8 +1201,13 @@ function remplirAgents() {
   for (const id of ["tous", ...ORDRE_CATEGORIES]) {
     const b = document.createElement("button");
     b.type = "button";
-    b.textContent = id === "tous" ? "Tous" : CATEGORIES[id].nom;
-    if (id !== "tous") b.style.setProperty("--couleur", CATEGORIES[id].couleur);
+    if (id === "tous") b.textContent = "Tous";
+    else {
+      b.innerHTML = symboleCategorie(id) + "<span></span>";
+      b.querySelector("span").textContent = CATEGORIES[id].nom;
+      b.title = CATEGORIES[id].texte;
+      b.style.setProperty("--couleur", CATEGORIES[id].couleur);
+    }
     b.setAttribute("aria-pressed", String(filtreHeros === id));
     b.addEventListener("click", () => { audio.clic(); filtreHeros = id; for (const x of f.children) x.setAttribute("aria-pressed", String(x === b)); remplirGrilleHeros(); });
     f.appendChild(b);
@@ -1223,7 +1230,7 @@ function remplirGrilleHeros() {
     b.style.setProperty("--c", CATEGORIES[h.categorie].couleur);
     b.title = `${h.nom} — ${CATEGORIES[h.categorie].nom}, ${h.role}`;
     const url = vitrine && vitrine.portraits.get(h.id);
-    b.innerHTML = `<span class="bande"></span><span class="initiale">${h.nom[0]}</span><img alt="" ${url ? "" : "hidden"}><span class="nom"></span>`;
+    b.innerHTML = `<span class="bande"></span><span class="symbole-cat">${symboleCategorie(h.categorie)}</span><span class="initiale">${h.nom[0]}</span><img alt="" ${url ? "" : "hidden"}><span class="nom"></span>`;
     if (url) { b.querySelector("img").src = url; b.querySelector(".initiale").hidden = true; }
     b.querySelector(".nom").textContent = h.nom;
     b.addEventListener("click", () => { audio.clic(); afficherHeros(h.id, true); });
@@ -1238,7 +1245,9 @@ function afficherHeros(id, apparition) {
   herosVu = id;
   const cat = CATEGORIES[h.categorie];
   $("ecran-agents").style.setProperty("--cat", cat.couleur);
-  $("heros-categorie").textContent = cat.nom;
+  $("heros-categorie").innerHTML = symboleCategorie(h.categorie) + "<span></span>";
+  $("heros-categorie").querySelector("span").textContent = cat.nom;
+  $("heros-categorie").title = cat.texte;
   $("heros-nom").textContent = h.nom;
   $("heros-role").textContent = h.role;
   $("heros-difficulte").innerHTML = `Difficulté <b>${etoiles(h.difficulte)}</b> ${NOMS_DIFFICULTE[h.difficulte]}`;
@@ -1835,6 +1844,37 @@ function lierCase(id, cle, apres) {
   c.addEventListener("change", () => { reglages[cle] = c.checked; sauverReglages(); if (apres) apres(c.checked); });
 }
 lierCase("annonceur", "annonceur", (v) => { audio.annonceur = v; });
+lierCase("inverserY", "inverserY");
+lierReglage("volumeArmes", "volumeArmes", pct, (v) => audio.reglerFamille("armes", v));
+lierReglage("volumeEffets", "volumeEffets", pct, (v) => audio.reglerFamille("effets", v));
+lierReglage("volumeInterface", "volumeInterface", pct, (v) => audio.reglerFamille("interface", v));
+for (const [cat, cle] of [["armes", "volumeArmes"], ["effets", "volumeEffets"], ["interface", "volumeInterface"]]) audio.reglerFamille(cat, reglages[cle]);
+lierCase("minimap", "minimap", (v) => { $("minimap").hidden = !v; });
+$("minimap").hidden = !reglages.minimap;
+// Ombres : désactivables à chaud (les matériaux sont recompilés une fois)
+function appliquerOmbres() {
+  const actives = profil.ombres && reglages.ombres !== "aucune";
+  if (renderer.shadowMap.enabled === actives) return;
+  renderer.shadowMap.enabled = actives;
+  renderer.shadowMap.needsUpdate = true;
+  scene.traverse((o) => { if (o.material) for (const m of [].concat(o.material)) m.needsUpdate = true; });
+}
+function appliquerEffets() { effets.densite = reglages.effets === "reduits" ? 0.4 : 1; }
+for (const [id, appliquer] of [["ombres", appliquerOmbres], ["effets", appliquerEffets]]) {
+  const choix = $("r-" + id);
+  choix.value = reglages[id];
+  rafraichisseurs.push(() => { choix.value = reglages[id]; appliquer(); });
+  choix.addEventListener("change", () => { reglages[id] = choix.value; sauverReglages(); appliquer(); });
+  appliquer();
+}
+$("r-reinitialiser").addEventListener("click", () => {
+  audio.clic();
+  const garder = { mode: reglages.mode, carte: reglages.carte, difficulte: reglages.difficulte, serveur: reglages.serveur };
+  Object.assign(reglages, DEFAUTS, garder);
+  sauverReglages();
+  for (const r of rafraichisseurs) r();
+  hud.annonce("", "Paramètres réinitialisés", "#7cffd4", 1);
+});
 lierCase("resolutionDynamique", "resolutionDynamique");
 lierCase("fps", "fps", (v) => { $("fps").hidden = !v; });
 $("fps").hidden = !reglages.fps;
