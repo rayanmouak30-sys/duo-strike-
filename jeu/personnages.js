@@ -12,7 +12,8 @@ import { HEROS } from "./heros.js";
 import { apparenceAvecSkin, habillerMateriaux } from "./skins.js";
 import { mergeGeometries } from "three/addons/utils/BufferGeometryUtils.js";
 
-export const COULEURS_EQUIPE = { bleu: 0x4fd2ff, rouge: 0xff4655 };
+// Équipe alliée en or, adverse en rouge : toujours distinctes
+export const COULEURS_EQUIPE = { bleu: 0xffc24a, rouge: 0xff4655 };
 
 // Mannequin du stand de tir (pas un héros jouable)
 const APPARENCE_MANNEQUIN = {

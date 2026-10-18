@@ -20,10 +20,10 @@ const CADRAGE = {
 function construireBras(qualite, cote) {
   const tissu = textureTissu(qualite);
   const mats = {
-    manche: new THREE.MeshStandardMaterial({ color: 0x2c3a56, map: tissu.map, normalMap: qualite === "basse" ? null : tissu.normalMap, roughness: 0.9 }),
+    manche: new THREE.MeshStandardMaterial({ color: 0x2b2a2c, map: tissu.map, normalMap: qualite === "basse" ? null : tissu.normalMap, roughness: 0.9 }),
     gant: new THREE.MeshStandardMaterial({ color: 0x23262d, roughness: 0.72 }),
     renfort: new THREE.MeshStandardMaterial({ color: 0x454b57, roughness: 0.55, metalness: 0.2 }),
-    accent: new THREE.MeshStandardMaterial({ color: 0x7cffd4, emissive: 0x3fe0b0, emissiveIntensity: 0.5 }),
+    accent: new THREE.MeshStandardMaterial({ color: 0xf0cf86, emissive: 0xd49a3a, emissiveIntensity: 0.5 }),
   };
   const epaule = new THREE.Group();
   const coude = new THREE.Group();
@@ -70,11 +70,11 @@ export class VueArme {
     this.qualite = qualite;
     this.scene = new THREE.Scene();
     this.camera = new THREE.PerspectiveCamera(62, 1, 0.01, 10);
-    this.scene.add(new THREE.HemisphereLight(0xd4e2ff, 0x4a4036, 1.25));
+    this.scene.add(new THREE.HemisphereLight(0xeee6d8, 0x4a4036, 1.25));
     const cle = new THREE.DirectionalLight(0xfff0dc, 2.6);
     cle.position.set(-1.2, 2, 1.2);
     this.scene.add(cle);
-    const contre = new THREE.DirectionalLight(0x9fc4ff, 1.2);
+    const contre = new THREE.DirectionalLight(0xe6dccb, 1.2);
     contre.position.set(1.4, 0.6, -1.2);
     this.scene.add(contre);
 

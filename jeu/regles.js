@@ -138,7 +138,7 @@ export class Regles {
       const d = this.carte.departJoueur("attaque");
       joueur.placer(d.x, d.z, 0);
       this.carte.barriere.activer(false);
-      jeu.hud.annonce(def.nom.toUpperCase(), def.texte, "#7cc4ff", 3);
+      jeu.hud.annonce(def.nom.toUpperCase(), def.texte, "#f0cf86", 3);
       if (this.defi.id === "libre") { this.defi.etat = "actif"; this.remplirStand(); }
       jeu.musique.etat("calme");
     }
@@ -221,7 +221,7 @@ export class Regles {
       jeu.hud.annonce(`MANCHE ${this.manche}`, "Balle de match !", "#ffd166", 2.6);
       jeu.audio.parler("Balle de match.");
     } else {
-      jeu.hud.annonce(`MANCHE ${this.manche}`, `${camp} · Achète ton équipement (B)`, "#7cc4ff", 2.6);
+      jeu.hud.annonce(`MANCHE ${this.manche}`, `${camp} · Achète ton équipement (B)`, "#f0cf86", 2.6);
     }
     jeu.audio.annonce("manche");
     jeu.musique.etat("achat");
@@ -714,8 +714,8 @@ export class Regles {
       if (d.etat === "compte") {
         const avant = Math.ceil(d.t);
         d.t -= dt;
-        if (Math.ceil(d.t) < avant && d.t > 0) { jeu.hud.annonce(String(Math.ceil(d.t)), "", "#e9f1ff", 0.8); jeu.audio.annonce("compte"); }
-        if (d.t <= 0) { d.etat = "actif"; jeu.hud.annonce("GO !", "", "#7cffd4", 0.8); jeu.audio.annonce("debut"); this.remplirStand(); }
+        if (Math.ceil(d.t) < avant && d.t > 0) { jeu.hud.annonce(String(Math.ceil(d.t)), "", "#efe9dc", 0.8); jeu.audio.annonce("compte"); }
+        if (d.t <= 0) { d.etat = "actif"; jeu.hud.annonce("GO !", "", "#f0cf86", 0.8); jeu.audio.annonce("debut"); this.remplirStand(); }
       } else if (d.etat === "actif") {
         d.ecoule += dt;
         if (d.remplirT > 0) { d.remplirT -= dt; if (d.remplirT <= 0) this.remplirStand(); }
@@ -744,7 +744,7 @@ export class Regles {
           r.c.arme = this.armeHeros(r.c.heros);
           this.bots.placer(r.c, p.x, p.z, this.lacetVersCentre(p) + Math.PI);
         }
-        jeu.effets.apparition({ x: p.x, y: 0, z: p.z }, 0x7cffd4);
+        jeu.effets.apparition({ x: p.x, y: 0, z: p.z }, 0xffcf6a);
         r.fait = true;
       }
       this.reapparitions = this.reapparitions.filter((r) => !r.fait);
@@ -756,14 +756,14 @@ export class Regles {
     if (this.phase === "preparation") {
       this.phaseT -= dt;
       const reste = Math.ceil(this.phaseT);
-      if (reste < this.compteur && reste <= 3 && reste > 0) { jeu.audio.annonce("compte"); jeu.hud.annonce(String(reste), "", "#e9f1ff", 0.8); }
+      if (reste < this.compteur && reste <= 3 && reste > 0) { jeu.audio.annonce("compte"); jeu.hud.annonce(String(reste), "", "#efe9dc", 0.8); }
       this.compteur = reste;
       if (this.phaseT <= 0) {
         this.phase = "combat";
         this.carte.barriere.activer(false);
         const camp = this.campJoueur === "attaque";
         const sous = this.mode === "spike" ? (camp ? "Pose le spike sur A ou B" : "Défends les sites A et B") : "Élimine l'équipe adverse";
-        jeu.hud.annonce("COMBAT", sous, "#7cffd4", 1.6);
+        jeu.hud.annonce("COMBAT", sous, "#f0cf86", 1.6);
         jeu.audio.annonce("debut");
         jeu.musique.etat("combat");
         this.bots.phase = "combat";

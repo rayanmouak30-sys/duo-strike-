@@ -199,13 +199,13 @@ export function textureFacade(graine) {
   c.width = 256; c.height = 512;
   const ctx = c.getContext("2d");
   const rng = aleatoire(graine);
-  ctx.fillStyle = "#0b1020";
+  ctx.fillStyle = "#0c0a07";
   ctx.fillRect(0, 0, 256, 512);
   for (let y = 8; y < 512; y += 16) {
     for (let x = 8; x < 256; x += 14) {
       const r = rng();
       if (r < 0.32) {
-        ctx.fillStyle = r < 0.06 ? "#7cc4ff" : r < 0.12 ? "#ffb15c" : "#2a3858";
+        ctx.fillStyle = r < 0.06 ? "#ffd27a" : r < 0.12 ? "#ffb15c" : "#2a2318";
         ctx.fillRect(x, y, 8, 9);
       }
     }

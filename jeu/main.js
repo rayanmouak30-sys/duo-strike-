@@ -188,7 +188,7 @@ competences.surResurrection = (lanceur, def) => {
     if (b.mannequin || b.vivant || b.equipe !== lanceur.equipe || Math.hypot(b.x - lanceur.x, b.z - lanceur.z) > (def.rayon || 30)) continue;
     bots.placer(b, b.x, b.z, b.yaw);
     effets.apparition({ x: b.x, y: 0, z: b.z }, 0xfff0b0);
-    if (b.equipe === joueur.equipe) hud.fil(lanceur === joueur ? "TOI" : lanceur.nom, b.nom + " est de retour", false, "info", null, ["#7cffd4", "#e9f1ff"]);
+    if (b.equipe === joueur.equipe) hud.fil(lanceur === joueur ? "TOI" : lanceur.nom, b.nom + " est de retour", false, "info", null, ["#f0cf86", "#efe9dc"]);
   }
   if (!joueur.vivant && joueur.equipe === lanceur.equipe && lanceur !== joueur && Math.hypot(joueur.x - lanceur.x, joueur.z - lanceur.z) <= (def.rayon || 30)) {
     joueur.placer(joueur.x, joueur.z, joueur.lacet);
@@ -292,7 +292,7 @@ function enregistrer() {
 }
 
 // ===== Dégâts, éliminations =====
-const couleurDe = (c) => (c && (c.estJoueur || (regles.mode !== "deathmatch" && partie.mode !== "enligne" && c.equipe === joueur.equipe)) ? "#7cffd4" : "#ff6b78");
+const couleurDe = (c) => (c && (c.estJoueur || (regles.mode !== "deathmatch" && partie.mode !== "enligne" && c.equipe === joueur.equipe)) ? "#f0cf86" : "#ff6b78");
 
 jeu.infliger = (c, degats, auteur, tete, arme) => {
   if (!c || !c.vivant) return;
@@ -340,7 +340,7 @@ function mortJoueur(tueur, tete, arme) {
   mortCamT = 0;
   if (partie.mode === "enligne") enLigne.mortLocale(tueur, tete, arme);
   else {
-    hud.fil(tueur ? tueur.nom : "", "TOI", tete, "victime", arme, [couleurDe(tueur), "#7cffd4"]);
+    hud.fil(tueur ? tueur.nom : "", "TOI", tete, "victime", arme, [couleurDe(tueur), "#f0cf86"]);
     regles.surMort(joueur, tueur, tete, arme);
   }
   // Killcam : on revoit les dernières secondes depuis les yeux du tueur
@@ -388,7 +388,7 @@ bots.surTir = (bot, depart, arrivee, touche, mur, plomb) => {
 };
 
 bots.surSite = (equipe, site) => {
-  if (equipe === joueur.equipe && audio.limite("site" + site, 8)) hud.fil("Équipe", `Ennemis repérés sur ${site} !`, false, "info", null, ["#5ad8ff", "#e9f1ff"]);
+  if (equipe === joueur.equipe && audio.limite("site" + site, 8)) hud.fil("Équipe", `Ennemis repérés sur ${site} !`, false, "info", null, ["#e8c372", "#efe9dc"]);
 };
 
 competences.surAveugle = (c, intensite, duree) => {
@@ -453,7 +453,7 @@ jeu.preparerManche = () => {
 jeu.finManche = (recap, ace) => {
   hud.recap(recap);
   if (ace) { hud.annonce("ACE", "Tu as éliminé toute l'équipe adverse !", "#ffd166", 3.4); profilJ.debloquer("ace"); audio.parler("Ace !"); }
-  else hud.annonce(recap.gagnee ? "MANCHE GAGNÉE" : "MANCHE PERDUE", recap.raison, recap.gagnee ? "#7cffd4" : "#ff5f6d", 3);
+  else hud.annonce(recap.gagnee ? "MANCHE GAGNÉE" : "MANCHE PERDUE", recap.raison, recap.gagnee ? "#f0cf86" : "#ff5f6d", 3);
   audio.annonce(recap.gagnee ? "victoire" : "defaite");
   musique.jingle(recap.gagnee ? "manche" : "perdue");
   musique.etat("achat");
@@ -645,7 +645,7 @@ function traiterActions() {
       case "ultime": {
         const slot = { fumee: "c", flash: "q", signature: "e", ultime: "x" }[a];
         const capId = joueur.capacites[slot].id;
-        if (partie.mode === "enligne" && !FAMILLES_PERSONNELLES.has(CAPACITES[capId].famille)) { hud.annonce("", "Capacité indisponible en ligne", "#94a7c9", 1); break; }
+        if (partie.mode === "enligne" && !FAMILLES_PERSONNELLES.has(CAPACITES[capId].famille)) { hud.annonce("", "Capacité indisponible en ligne", "#a8a092", 1); break; }
         if (!enCombat() && a !== "signature") { audio.refus(); break; }
         if (joueur.empT > 0) { hud.annonce("", "Capacités brouillées par une IEM", "#ff6b78", 0.8); audio.refus(); break; }
         if (joueur.utiliser(a, controles.cmd, enCombat())) { hud.activerCapacite(a); if (a === "ultime") annoncerUltime(capId); }
@@ -664,7 +664,7 @@ function listeOrdres() {
 function basculerOrdres(ouvert) {
   if (ouvert) {
     const allies = bots.liste.some((b) => b.equipe === joueur.equipe && !b.mannequin);
-    if (!allies || !MODES[regles.mode].equipes || partie.mode === "enligne") { hud.annonce("", "Pas de coéquipiers dans ce mode", "#94a7c9", 1.2); return; }
+    if (!allies || !MODES[regles.mode].equipes || partie.mode === "enligne") { hud.annonce("", "Pas de coéquipiers dans ce mode", "#a8a092", 1.2); return; }
   }
   ordresOuverts = ouvert;
   controles.menuOrdres = ouvert;
@@ -674,10 +674,10 @@ function donnerOrdre(n) {
   const types = [{ type: "suivre" }, { type: "site", site: "A" }, { type: "site", site: "B" }, { type: "tenir" }, null];
   bots.ordonner(joueur.equipe, types[n - 1]);
   basculerOrdres(false);
-  hud.fil("TOI", "« " + listeOrdres()[n - 1] + " »", false, "info", null, ["#7cffd4", "#e9f1ff"]);
+  hud.fil("TOI", "« " + listeOrdres()[n - 1] + " »", false, "info", null, ["#f0cf86", "#efe9dc"]);
   audio.clic();
   const repondeur = bots.liste.find((b) => b.equipe === joueur.equipe && b.vivant);
-  if (repondeur) setTimeout(() => hud.fil(repondeur.nom, "Bien reçu !", false, "info", null, ["#5ad8ff", "#e9f1ff"]), 500);
+  if (repondeur) setTimeout(() => hud.fil(repondeur.nom, "Bien reçu !", false, "info", null, ["#e8c372", "#efe9dc"]), 500);
 }
 
 // ===== Spectateur (après la mort, en mode équipe) =====
@@ -855,7 +855,7 @@ const texRepere = (() => {
   const c = document.createElement("canvas");
   c.width = c.height = 64;
   const g = c.getContext("2d");
-  g.fillStyle = "#4fd2ff"; g.strokeStyle = "rgba(0,0,0,0.65)"; g.lineWidth = 5;
+  g.fillStyle = "#ffc24a"; g.strokeStyle = "rgba(0,0,0,0.65)"; g.lineWidth = 5;
   g.beginPath(); g.moveTo(14, 18); g.lineTo(50, 18); g.lineTo(32, 46); g.closePath(); g.stroke(); g.fill();
   return new THREE.CanvasTexture(c);
 })();
@@ -1387,7 +1387,7 @@ function remplirArsenal() {
   // Filtres
   const filtres = $("filtres-rarete");
   filtres.innerHTML = "";
-  for (const [id, nom, couleur] of [["toutes", "Toutes", "#e9f1ff"], ...Object.values(RARETES).map((r) => [r.id, r.nom, r.couleur])]) {
+  for (const [id, nom, couleur] of [["toutes", "Toutes", "#efe9dc"], ...Object.values(RARETES).map((r) => [r.id, r.nom, r.couleur])]) {
     const b = document.createElement("button");
     b.type = "button";
     b.className = "filtre-rarete" + (a.rarete === id ? " actif" : "");
@@ -1657,7 +1657,7 @@ $("reinit-touches").addEventListener("click", () => {
 
 // ===== Boutique =====
 function ouvrirBoutique() {
-  if (!regles.peutAcheter()) { hud.annonce("", "La boutique s'ouvre pendant la phase d'achat", "#94a7c9", 1.4); return; }
+  if (!regles.peutAcheter()) { hud.annonce("", "La boutique s'ouvre pendant la phase d'achat", "#a8a092", 1.4); return; }
   boutiqueOuverte = true;
   controles.relacher();
   if (document.pointerLockElement) document.exitPointerLock();
@@ -1873,7 +1873,7 @@ $("r-reinitialiser").addEventListener("click", () => {
   Object.assign(reglages, DEFAUTS, garder);
   sauverReglages();
   for (const r of rafraichisseurs) r();
-  hud.annonce("", "Paramètres réinitialisés", "#7cffd4", 1);
+  hud.annonce("", "Paramètres réinitialisés", "#f0cf86", 1);
 });
 lierCase("resolutionDynamique", "resolutionDynamique");
 lierCase("fps", "fps", (v) => { $("fps").hidden = !v; });

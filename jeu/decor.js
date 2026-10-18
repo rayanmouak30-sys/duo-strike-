@@ -38,12 +38,12 @@ export function decorer({ groupe, monde, mat, qualite, ombres, nexus = false }) 
     tuyau: new THREE.MeshStandardMaterial({ color: 0x5b636e, roughness: 0.45, metalness: 0.7 }),
     tuyauRouge: new THREE.MeshStandardMaterial({ color: 0x8a2c25, roughness: 0.5, metalness: 0.4 }),
     cable: new THREE.MeshStandardMaterial({ color: 0x111215, roughness: 0.7 }),
-    verre: new THREE.MeshStandardMaterial({ color: 0x1b2433, roughness: 0.08, metalness: 0.8, emissive: 0x0b1424, emissiveIntensity: 1 }),
+    verre: new THREE.MeshStandardMaterial({ color: 0x2a2216, roughness: 0.08, metalness: 0.8, emissive: 0x181006, emissiveIntensity: 1 }),
     cadre: new THREE.MeshStandardMaterial({ color: 0x2c3038, roughness: 0.5, metalness: 0.6 }),
     bois: new THREE.MeshStandardMaterial({ color: 0x8a6a45, roughness: 0.85 }),
     sac: new THREE.MeshStandardMaterial({ color: 0x6d6450, roughness: 0.95 }),
     lampe: new THREE.MeshStandardMaterial({ color: 0xfff0d8, emissive: 0xffe2b8, emissiveIntensity: 2.2, toneMapped: true }),
-    led: new THREE.MeshStandardMaterial({ color: 0x7cffd4, emissive: 0x3fe0b0, emissiveIntensity: 1.5 }),
+    led: new THREE.MeshStandardMaterial({ color: 0xffd27a, emissive: 0xe0a040, emissiveIntensity: 1.5 }),
     ledRouge: new THREE.MeshStandardMaterial({ color: 0xff5a4a, emissive: 0xff3a2a, emissiveIntensity: 1.5 }),
     jaune: new THREE.MeshStandardMaterial({ color: 0xe0b020, roughness: 0.6 }),
     caoutchouc: new THREE.MeshStandardMaterial({ color: 0x1a1b1e, roughness: 0.95 }),
@@ -242,12 +242,12 @@ export function decorer({ groupe, monde, mat, qualite, ombres, nexus = false }) 
 
   // ----- Panneaux de signalisation -----
   const panneaux = [
-    { t: texte(["SECTEUR A", "QUAI DE CHARGEMENT 07"], "#3fa8ff", "#0d1626"), x: 31.95, y: 3.4, z: 8, ry: -Math.PI / 2, l: 3.2, h: 0.8 },
+    { t: texte(["SECTEUR A", "QUAI DE CHARGEMENT 07"], "#f0c25a", "#16120a"), x: 31.95, y: 3.4, z: 8, ry: -Math.PI / 2, l: 3.2, h: 0.8 },
     { t: texte(["SECTEUR B", "ENTREPÔT FRIGORIFIQUE"], "#ff4f8a", "#1a0d16"), x: -31.95, y: 3.4, z: 6, ry: Math.PI / 2, l: 3.2, h: 0.8 },
     { t: texte(["NEXUS LOGISTIQUE"], "#e8e8f0", "#11141b"), x: 0, y: 5.6, z: 22 - 0.05, ry: Math.PI, l: 6, h: 1.1 },
     { t: texte(["⚠ HAUTE TENSION"], "#16181d", "#e8b419", 512, 96), x: 12.5, y: 2.1, z: -12.42, ry: 0, l: 1.1, h: 0.2 },
     { t: texte(["⚠ HAUTE TENSION"], "#16181d", "#e8b419", 512, 96), x: -12.5, y: 2.1, z: -12.42, ry: 0, l: 1.1, h: 0.2 },
-    { t: texte(["ZONE DE DÉPART"], "#7cffd4", "#0b1a18"), x: 0, y: 2.4, z: 21.95, ry: Math.PI, l: 2.6, h: 0.65 },
+    { t: texte(["ZONE DE DÉPART"], "#f0cf86", "#14110a"), x: 0, y: 2.4, z: 21.95, ry: Math.PI, l: 2.6, h: 0.65 },
   ];
   for (const p of panneaux) {
     const m = new THREE.Mesh(new THREE.PlaneGeometry(p.l, p.h), new THREE.MeshStandardMaterial({ map: p.t, roughness: 0.6, emissive: 0xffffff, emissiveMap: p.t, emissiveIntensity: 0.25, polygonOffset: true, polygonOffsetFactor: -2 }));

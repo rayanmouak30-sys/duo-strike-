@@ -263,7 +263,7 @@ export class PartieEnLigne {
     const p = jeu.regles.pointReapparition(b);
     b.arme = jeu.regles.armeHeros(b.heros);
     jeu.bots.placer(b, p.x, p.z, jeu.regles.lacetVersCentre(p) + Math.PI);
-    jeu.effets.apparition({ x: p.x, y: 0, z: p.z }, 0x7cffd4);
+    jeu.effets.apparition({ x: p.x, y: 0, z: p.z }, 0xffcf6a);
   }
 
   // Joueur distant, ou bot de l'hôte vu par les autres

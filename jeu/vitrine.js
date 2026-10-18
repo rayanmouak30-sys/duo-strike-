@@ -29,7 +29,7 @@ export class Vitrine {
     const cle = new THREE.DirectionalLight(0xfff2e0, 2.4);
     cle.position.set(2, 4, 3);
     this.scene.add(cle);
-    this.contre = new THREE.DirectionalLight(0x7cffd4, 2.2);
+    this.contre = new THREE.DirectionalLight(0xffd9a0, 2.2);
     this.contre.position.set(-3, 2.5, -3);
     this.scene.add(this.contre);
 

@@ -42,8 +42,8 @@ const nexus = {
   construire({ mur, caisse, baril, boite, peinture, lampe }) {
     mur(0, -22.5, 66, 1, 7); mur(0, 22.5, 66, 1, 7); mur(-32.5, 0, 1, 44, 7); mur(32.5, 0, 1, 44, 7);
     mur(-11, -7.25, 1, 10.5, 4.5, 0xff4f8a); mur(-11, 7.25, 1, 10.5, 4.5, 0xff4f8a);
-    mur(11, -7.25, 1, 10.5, 4.5, 0x3fa8ff); mur(11, 7.25, 1, 10.5, 4.5, 0x3fa8ff);
-    mur(14.75, 11, 6.5, 1, 4.5, 0x3fa8ff); mur(27, 11, 10, 1, 4.5, 0x3fa8ff);
+    mur(11, -7.25, 1, 10.5, 4.5, 0xe8b84a); mur(11, 7.25, 1, 10.5, 4.5, 0xe8b84a);
+    mur(14.75, 11, 6.5, 1, 4.5, 0xe8b84a); mur(27, 11, 10, 1, 4.5, 0xe8b84a);
     mur(-14.75, 11, 6.5, 1, 4.5, 0xff4f8a); mur(-27, 11, 10, 1, 4.5, 0xff4f8a);
     mur(-7, 11, 7, 1, 4.5); mur(7, 11, 7, 1, 4.5);
     mur(13.75, -13, 4.5, 1, 4.5); mur(28, -13, 8, 1, 4.5); mur(-13.75, -13, 4.5, 1, 4.5); mur(-28, -13, 8, 1, 4.5);
@@ -58,11 +58,11 @@ const nexus = {
     boite(-6, -7.5, 4, 0.8, 2.2, "mur");
     caisse(-6, 16, 2, 2, 1.2, "gris"); caisse(7, 17, 2, 2, 1.2, "bleu"); caisse(-8, -17, 2, 2, 1.2, "gris"); caisse(9, -16.5, 3, 2, 2, "orange");
     boite(0, -18.5, 4, 1, 1.5, "mur");
-    peinture("A", "#3fa8ff", 22, 0.02, -2, 0, 6, true); peinture("B", "#ff4f8a", -21, 0.02, -1, 0, 6, true);
-    peinture("A", "#3fa8ff", 31.99, 3, -2, -Math.PI / 2, 3.2); peinture("B", "#ff4f8a", -31.99, 3, -1, Math.PI / 2, 3.2);
-    peinture("A ►", "#3fa8ff", 7, 2.6, 11.51, 0, 3.2); peinture("◄ B", "#ff4f8a", -7, 2.6, 11.51, 0, 3.2);
-    peinture("MID", "#9aa6b8", 0, 3.4, -21.99, 0, 4);
-    lampe(22, 3.6, -12.4, 0x3fa8ff); lampe(-22, 3.6, -12.4, 0xff4f8a); lampe(7, 3.6, 10.4, 0xffb15c); lampe(0, 5.2, -21.9, 0xe8e8f0);
+    peinture("A", "#e8b84a", 22, 0.02, -2, 0, 6, true); peinture("B", "#ff4f8a", -21, 0.02, -1, 0, 6, true);
+    peinture("A", "#e8b84a", 31.99, 3, -2, -Math.PI / 2, 3.2); peinture("B", "#ff4f8a", -31.99, 3, -1, Math.PI / 2, 3.2);
+    peinture("A ►", "#e8b84a", 7, 2.6, 11.51, 0, 3.2); peinture("◄ B", "#ff4f8a", -7, 2.6, 11.51, 0, 3.2);
+    peinture("MID", "#b8ab92", 0, 3.4, -21.99, 0, 4);
+    lampe(22, 3.6, -12.4, 0xe8b84a); lampe(-22, 3.6, -12.4, 0xff4f8a); lampe(7, 3.6, 10.4, 0xffb15c); lampe(0, 5.2, -21.9, 0xe8e8f0);
   },
 };
 
@@ -124,14 +124,14 @@ const bazar = {
     caisse(-3, -8, 1.4, 1.4, 1.2, "bois"); caisse(3, 5.5, 1.4, 1.4, 1.2, "bois");
     caisse(-8, 18.5, 2, 2, 1.2, "bois"); caisse(8, 19.5, 2, 2, 1.2, "bois");
     caisse(-6, -19.5, 2, 2, 1.2, "bois"); caisse(6.5, -20, 3, 1, 1.5, "bois");
-    peinture("A", "#2d7fd8", 21, 0.02, -3, 0, 5, true); peinture("B", "#d83a6a", -21, 0.02, -3, 0, 5, true);
-    peinture("A ►", "#2d7fd8", 19, 3, 14.01, 0, 2.6); peinture("◄ B", "#d83a6a", -19, 3, 14.01, 0, 2.6);
+    peinture("A", "#d8a22a", 21, 0.02, -3, 0, 5, true); peinture("B", "#d83a6a", -21, 0.02, -3, 0, 5, true);
+    peinture("A ►", "#d8a22a", 19, 3, 14.01, 0, 2.6); peinture("◄ B", "#d83a6a", -19, 3, 14.01, 0, 2.6);
     lampe(-14.4, 3.4, -3, 0xffc27a, Math.PI / 2); lampe(14.4, 3.4, -3, 0xffc27a, -Math.PI / 2);
   },
   decor({ A, mats, groupe, monde, riche }) {
     // Bâches au-dessus des étals (pas de collision : on passe dessous)
     const baches = [
-      [-22, -4, 3.2, 2.2, "#c8322f", "#f0e3c8"], [-18, 2.2, 2.2, 3.2, "#2f6fc8", "#f0e3c8"],
+      [-22, -4, 3.2, 2.2, "#c8322f", "#f0e3c8"], [-18, 2.2, 2.2, 3.2, "#1e1c22", "#f0e3c8"],
       [20, -2, 3.2, 2.2, "#e0a21a", "#f0e3c8"], [24, -8, 2.2, 3.2, "#2f9c5f", "#f0e3c8"],
       [-3, 13.2, 6.4, 2.2, "#7a3fb0", "#f0e3c8"],
     ];
@@ -146,7 +146,7 @@ const bazar = {
       for (let k = 0; k < 6; k++) A.ajouter(new THREE.SphereGeometry(0.09, 8, 6), k % 2 ? "fruitRouge" : "fruitJaune", { p: [x - l / 4 + (k % 3) * 0.3, 1.12, z - 0.15 + Math.floor(k / 3) * 0.3] });
     }
     // Eau de la fontaine
-    const eau = new THREE.Mesh(new THREE.CircleGeometry(1.35, 24), new THREE.MeshStandardMaterial({ color: 0x3a8fb0, roughness: 0.05, metalness: 0.4, transparent: true, opacity: 0.85 }));
+    const eau = new THREE.Mesh(new THREE.CircleGeometry(1.35, 24), new THREE.MeshStandardMaterial({ color: 0x2e2a22, roughness: 0.05, metalness: 0.4, transparent: true, opacity: 0.85 }));
     eau.rotation.x = -Math.PI / 2;
     eau.position.set(0, 0.8, 0);
     groupe.add(eau);
@@ -234,8 +234,8 @@ const hangar = {
     caisse(14, 11, 2.6, 7, 3.2, "blanc"); caisse(26, 6, 2.6, 6, 2.6, "gris"); caisse(18, 2, 2, 2, 1.2, "bois");
     caisse(-14, 12, 2, 2, 1.2, "bois"); caisse(-20, 9, 8, 1, 2.2, "mur"); caisse(4, 17, 2, 2, 1.2, "bois");
     caisse(-4, -20, 2, 2, 1.2, "bois"); caisse(2.5, -21, 2, 1, 1.4, "gris");
-    peinture("A", "#3fa8ff", 19, 0.02, -13, 0, 5, true); peinture("B", "#ff4f8a", -20, 0.02, -9, 0, 5, true);
-    peinture("A", "#3fa8ff", 18, 4.5, -4.49, 0, 3); peinture("B ▼", "#ff4f8a", -24, 2.6, 4.51, 0, 2.6);
+    peinture("A", "#e8b84a", 19, 0.02, -13, 0, 5, true); peinture("B", "#ff4f8a", -20, 0.02, -9, 0, 5, true);
+    peinture("A", "#e8b84a", 18, 4.5, -4.49, 0, 3); peinture("B ▼", "#ff4f8a", -24, 2.6, 4.51, 0, 2.6);
     lampe(8.5, 5.6, -4.4, 0xffd9a8); lampe(18, 5.6, -4.4, 0xffd9a8); lampe(29, 5.6, -4.4, 0xffd9a8); lampe(-14.5, 3.6, 4.6, 0xff4f8a);
   },
   decor({ A, groupe, monde, riche }) {

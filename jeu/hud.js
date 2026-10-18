@@ -99,7 +99,7 @@ export class Hud {
     for (const el of document.querySelectorAll("[data-action-touche]")) el.textContent = etiquetteAction(el.dataset.actionTouche);
   }
 
-  annonce(texte, sous = "", couleur = "#e9f1ff", duree = 2) {
+  annonce(texte, sous = "", couleur = "#efe9dc", duree = 2) {
     this.el.annonce.textContent = texte;
     this.el.sousAnnonce.textContent = sous;
     this.el.annonce.style.color = couleur;
@@ -395,21 +395,21 @@ export class Hud {
       const f = document.createElement("canvas");
       f.width = W; f.height = H;
       const g = f.getContext("2d");
-      g.fillStyle = "rgba(8,14,28,0.78)";
+      g.fillStyle = "rgba(12,10,7,0.82)";
       g.fillRect(0, 0, W, H);
-      g.fillStyle = "rgba(70,90,124,0.55)";
+      g.fillStyle = "rgba(110,92,60,0.5)";
       g.fillRect(px(L.minX), py(L.minZ), largeur * k, profondeur * k);
       for (const [nom, s] of Object.entries(this.carte.sites || {})) {
-        g.fillStyle = nom === "A" ? "rgba(63,168,255,0.16)" : "rgba(255,79,138,0.16)";
+        g.fillStyle = nom === "A" ? "rgba(232,184,74,0.18)" : "rgba(255,79,138,0.16)";
         g.fillRect(px(s.minX), py(s.minZ), (s.maxX - s.minX) * k, (s.maxZ - s.minZ) * k);
       }
       for (const m of this.carte.murs2D) {
-        g.fillStyle = m.h > 2.5 ? "#c9d6ee" : "#7f8fae";
+        g.fillStyle = m.h > 2.5 ? "#e6d6b0" : "#9a8a68";
         g.fillRect(px(m.x), py(m.z), Math.max(1, m.l * k), Math.max(1, m.p * k));
       }
       g.font = "700 13px Orbitron, Arial, sans-serif";
       for (const [nom, s] of Object.entries(this.carte.sites || {})) {
-        g.fillStyle = nom === "A" ? "#3fa8ff" : "#ff4f8a";
+        g.fillStyle = nom === "A" ? "#d4ae62" : "#ff4f8a";
         g.fillText(nom, px(s.x) - 5, py(s.z) + 5);
       }
       this.fond = f;
@@ -449,7 +449,7 @@ export class Hud {
     ctx.globalAlpha = 1;
     // Alliés
     for (const a of e.allies) {
-      ctx.fillStyle = a.porteSpike ? "#ffd166" : "#5ad8ff";
+      ctx.fillStyle = a.porteSpike ? "#ffffff" : "#e8b84a";
       ctx.beginPath();
       ctx.arc(px(a.x), py(a.z), 3.4, 0, Math.PI * 2);
       ctx.fill();
@@ -474,7 +474,7 @@ export class Hud {
       ctx.save();
       ctx.translate(x, y);
       ctx.rotate(a + Math.PI / 2);
-      ctx.fillStyle = "#7cffd4";
+      ctx.fillStyle = "#f0cf86";
       ctx.beginPath();
       ctx.moveTo(0, -6); ctx.lineTo(4.5, 5); ctx.lineTo(0, 2.5); ctx.lineTo(-4.5, 5);
       ctx.closePath();

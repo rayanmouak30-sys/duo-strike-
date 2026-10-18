@@ -50,8 +50,10 @@ async function principal() {
   });
   const page = await contexte.newPage();
   page.on("pageerror", (e) => erreursConsole.push("pageerror: " + e.message));
-  page.on("console", (m) => { if (m.type() === "error") erreursConsole.push("console.error: " + m.text()); });
-  page.on("requestfailed", (r) => erreursConsole.push("requête échouée: " + r.url()));
+  page.on("console", (m) => { if (m.type() === "error" && !/fonts\.(googleapis|gstatic)/.test(m.text() + (m.location().url || ""))) erreursConsole.push("console.error: " + m.text()); });
+  // Les polices Google sont facultatives (police de secours) : leur indisponibilité n'est pas une erreur du jeu
+  const externeFacultatif = (url) => /fonts\.(googleapis|gstatic)\.com/.test(url);
+  page.on("requestfailed", (r) => { if (!externeFacultatif(r.url())) erreursConsole.push("requête échouée: " + r.url()); });
   page.on("response", (r) => { if (r.status() >= 400 && !r.url().includes("favicon")) erreursConsole.push(`HTTP ${r.status()}: ${r.url()}`); });
 
   const ev = (fn, arg) => page.evaluate(fn, arg);

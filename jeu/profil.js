@@ -27,7 +27,7 @@ export const SUCCES = {
 export const NIVEAUX_SKINS = Object.fromEntries(Object.entries(SKINS_ARMES).map(([id, s]) => [id, s.niveau || 1]));
 export const NIVEAUX_TENUES = Object.fromEntries(Object.entries(SKINS_AGENTS).map(([id, s]) => [id, s.niveau || 1]));
 
-export const VISEUR_DEFAUT = { couleur: "#7cffd4", longueur: 7, epaisseur: 2, ecart: 4, point: true, contour: true, dynamique: true };
+export const VISEUR_DEFAUT = { couleur: "#ffd27a", longueur: 7, epaisseur: 2, ecart: 4, point: true, contour: true, dynamique: true };
 
 const CLE = "duostrike-profil";
 

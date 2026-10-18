@@ -10,27 +10,27 @@ import { CARTES } from "./cartes.js";
 export const AMBIANCES = {
   jour: {
     nom: "Jour",
-    ciel: { zenith: [0.16, 0.38, 0.82], milieu: [0.45, 0.66, 0.94], horizon: [0.84, 0.9, 0.97], halo: [1.0, 0.95, 0.85], etoiles: 0 },
-    soleil: { couleur: 0xfff2df, intensite: 3.3, pos: [-22, 42, 16] },
-    hemi: { ciel: 0xd6e6ff, sol: 0xa09078, intensite: 1.5 },
-    brouillard: { couleur: 0xc4d8ee, pres: 90, loin: 300 },
-    fenetres: 0.12, facade: 0x6a7891, exposition: 1.0, env: 1.0, torche: false,
+    ciel: { zenith: [0.09, 0.065, 0.035], milieu: [0.55, 0.39, 0.19], horizon: [1.0, 0.82, 0.52], halo: [1.0, 0.88, 0.62], etoiles: 0 },
+    soleil: { couleur: 0xffe0b0, intensite: 3.3, pos: [-22, 42, 16] },
+    hemi: { ciel: 0xf2dfbe, sol: 0xa08a68, intensite: 1.5 },
+    brouillard: { couleur: 0xcfb58a, pres: 90, loin: 300 },
+    fenetres: 0.12, facade: 0x4a443c, exposition: 1.0, env: 1.0, torche: false,
   },
   soir: {
     nom: "Coucher de soleil",
-    ciel: { zenith: [0.06, 0.1, 0.24], milieu: [0.26, 0.3, 0.52], horizon: [1.0, 0.6, 0.4], halo: [1.0, 0.7, 0.45], etoiles: 0 },
+    ciel: { zenith: [0.04, 0.028, 0.016], milieu: [0.36, 0.2, 0.08], horizon: [1.0, 0.58, 0.26], halo: [1.0, 0.72, 0.4], etoiles: 0 },
     soleil: { couleur: 0xffcf9e, intensite: 3.1, pos: [-26, 24, 18] },
-    hemi: { ciel: 0xb0c8ff, sol: 0x5a4636, intensite: 1.25 },
-    brouillard: { couleur: 0x6a5e78, pres: 70, loin: 240 },
-    fenetres: 0.9, facade: 0x10131f, exposition: 1.15, env: 0.9, torche: false,
+    hemi: { ciel: 0xe6c08e, sol: 0x5a4636, intensite: 1.25 },
+    brouillard: { couleur: 0x6e5236, pres: 70, loin: 240 },
+    fenetres: 0.9, facade: 0x14100b, exposition: 1.15, env: 0.9, torche: false,
   },
   nuit: {
     nom: "Nuit",
-    ciel: { zenith: [0.01, 0.02, 0.05], milieu: [0.03, 0.05, 0.12], horizon: [0.1, 0.12, 0.22], halo: [0.6, 0.7, 0.9], etoiles: 1 },
-    soleil: { couleur: 0xa8c0ff, intensite: 1.3, pos: [20, 40, -10] },
-    hemi: { ciel: 0x6a80b0, sol: 0x25252e, intensite: 1.25 },
-    brouillard: { couleur: 0x0c1222, pres: 45, loin: 180 },
-    fenetres: 1.3, facade: 0x05070d, exposition: 1.35, env: 0.6, torche: true,
+    ciel: { zenith: [0.008, 0.006, 0.004], milieu: [0.04, 0.03, 0.016], horizon: [0.16, 0.11, 0.05], halo: [0.95, 0.78, 0.48], etoiles: 1 },
+    soleil: { couleur: 0xe8cf9e, intensite: 1.3, pos: [20, 40, -10] },
+    hemi: { ciel: 0x8a7656, sol: 0x2a2620, intensite: 1.25 },
+    brouillard: { couleur: 0x120d07, pres: 45, loin: 180 },
+    fenetres: 1.3, facade: 0x0a0806, exposition: 1.35, env: 0.6, torche: true,
   },
 };
 
@@ -40,16 +40,16 @@ export const METEOS = {
   brouillard: { nom: "Brouillard" },
 };
 
-const COULEURS_METAL = { orange: "#c8642a", bleu: "#2d5d8a", gris: "#6b7380", vert: "#3f6b4c", blanc: "#c9ccd1", jaune: "#d8a520", tole: "#8a949e", toleBleue: "#3d5f86" };
+const COULEURS_METAL = { orange: "#c8642a", bleu: "#1e1d20", gris: "#6b7380", vert: "#3f6b4c", blanc: "#c9ccd1", jaune: "#d8a520", tole: "#8a949e", toleBleue: "#8a6a2c" };
 const ENDUITS = { enduitSable: ["#dcc39a", 201], enduitOcre: ["#cf955e", 202], enduitBlanc: ["#e6dfd0", 203], pierre: ["#b8ab95", 204] };
 const SIMPLES = {
   tuyau: { color: 0x5b636e, roughness: 0.45, metalness: 0.7 }, tuyauRouge: { color: 0x8a2c25, roughness: 0.5, metalness: 0.4 },
   cable: { color: 0x111215, roughness: 0.7 }, cadre: { color: 0x2c3038, roughness: 0.5, metalness: 0.6 },
-  verre: { color: 0x1b2433, roughness: 0.08, metalness: 0.8, emissive: 0x0b1424, emissiveIntensity: 1 },
+  verre: { color: 0x2a2216, roughness: 0.08, metalness: 0.8, emissive: 0x181006, emissiveIntensity: 1 },
   sac: { color: 0x7d735c, roughness: 0.95 }, caoutchouc: { color: 0x1a1b1e, roughness: 0.95 }, carton: { color: 0xb08a5a, roughness: 0.9 },
   lampe: { color: 0xfff0d8, emissive: 0xffe2b8, emissiveIntensity: 2.2 }, ampoule: { color: 0xfff0c8, emissive: 0xffd28a, emissiveIntensity: 2.5 },
-  led: { color: 0x7cffd4, emissive: 0x3fe0b0, emissiveIntensity: 1.5 }, ledRouge: { color: 0xff5a4a, emissive: 0xff3a2a, emissiveIntensity: 1.5 },
-  fruitRouge: { color: 0xc8322f, roughness: 0.5 }, fruitJaune: { color: 0xe8b830, roughness: 0.5 }, volet: { color: 0x2f6f8f, roughness: 0.8 },
+  led: { color: 0xffd27a, emissive: 0xe0a040, emissiveIntensity: 1.5 }, ledRouge: { color: 0xff5a4a, emissive: 0xff3a2a, emissiveIntensity: 1.5 },
+  fruitRouge: { color: 0xc8322f, roughness: 0.5 }, fruitJaune: { color: 0xe8b830, roughness: 0.5 }, volet: { color: 0x7a5a2a, roughness: 0.8 },
   terre: { color: 0x9a5030, roughness: 0.9 }, plante: { color: 0x3f7a3a, roughness: 0.85 },
 };
 
@@ -173,11 +173,11 @@ export function construireCarte(scene, qualite, idCarte = "nexus", options = {})
   let barriere = { activer() {} };
   if (def.barriere !== null && def.barriere !== undefined) {
     const zb = def.barriere;
-    const matBarriere = new THREE.MeshBasicMaterial({ color: 0x3fa8ff, transparent: true, opacity: 0.07, depthWrite: false, side: THREE.DoubleSide });
+    const matBarriere = new THREE.MeshBasicMaterial({ color: 0xd4ae62, transparent: true, opacity: 0.07, depthWrite: false, side: THREE.DoubleSide });
     const barriereMesh = new THREE.Mesh(new THREE.PlaneGeometry(largeur, 7), matBarriere);
     barriereMesh.position.set((L.minX + L.maxX) / 2, 3.5, zb);
     groupe.add(barriereMesh);
-    const grille = new THREE.LineSegments(new THREE.WireframeGeometry(new THREE.PlaneGeometry(largeur, 7, Math.round(largeur), 7)), new THREE.LineBasicMaterial({ color: 0x7cc4ff, transparent: true, opacity: 0.13 }));
+    const grille = new THREE.LineSegments(new THREE.WireframeGeometry(new THREE.PlaneGeometry(largeur, 7, Math.round(largeur), 7)), new THREE.LineBasicMaterial({ color: 0xf0cf86, transparent: true, opacity: 0.13 }));
     grille.position.copy(barriereMesh.position);
     groupe.add(grille);
     const barriereBoite = monde.ajouter(L.minX, 0, zb - 0.1, L.maxX, 7, zb + 0.1, { type: "barriere", traversable: true });
@@ -248,9 +248,9 @@ export function construireCarte(scene, qualite, idCarte = "nexus", options = {})
   ciel.position.set((L.minX + L.maxX) / 2, 0, (L.minZ + L.maxZ) / 2);
   scene.add(ciel);
   const coulBrouillard = new THREE.Color(amb.brouillard.couleur);
-  if (meteo === "pluie") coulBrouillard.lerp(new THREE.Color(0x8890a0), heure === "nuit" ? 0.1 : 0.6);
+  if (meteo === "pluie") coulBrouillard.lerp(new THREE.Color(0x8c8478), heure === "nuit" ? 0.1 : 0.6);
   scene.fog = meteo === "brouillard"
-    ? new THREE.Fog(coulBrouillard.clone().lerp(new THREE.Color(0xd0d4da), heure === "nuit" ? 0.05 : 0.5), 6, 62)
+    ? new THREE.Fog(coulBrouillard.clone().lerp(new THREE.Color(0xd6cfc2), heure === "nuit" ? 0.05 : 0.5), 6, 62)
     : new THREE.Fog(coulBrouillard, meteo === "pluie" ? 25 : amb.brouillard.pres, meteo === "pluie" ? 150 : amb.brouillard.loin);
 
   // ----- Ville au loin -----
@@ -283,7 +283,7 @@ export function construireCarte(scene, qualite, idCarte = "nexus", options = {})
     const pos = new Float32Array(n * 6);
     const geo = new THREE.BufferGeometry();
     geo.setAttribute("position", new THREE.BufferAttribute(pos, 3));
-    const lignes = new THREE.LineSegments(geo, new THREE.LineBasicMaterial({ color: heure === "nuit" ? 0x7f8faa : 0xb8c4d4, transparent: true, opacity: 0.45, depthWrite: false }));
+    const lignes = new THREE.LineSegments(geo, new THREE.LineBasicMaterial({ color: heure === "nuit" ? 0x8a7f6a : 0xd4c8b0, transparent: true, opacity: 0.45, depthWrite: false }));
     lignes.frustumCulled = false;
     scene.add(lignes);
     const gouttes = [];
