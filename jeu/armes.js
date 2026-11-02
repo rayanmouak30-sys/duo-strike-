@@ -4,6 +4,7 @@
 import * as THREE from "three";
 import { boiteRonde, profil, revolution, Assemblage } from "./formes.js";
 import { SKINS_ARMES, materiauxSkinArme } from "./skins.js";
+import { piecesPulsarHD } from "./modeles/pulsar.js";
 
 const DEG = Math.PI / 180;
 
@@ -216,6 +217,7 @@ function materiauxCommunsArme(qualite) {
     lame: new THREE.MeshStandardMaterial({ color: 0xc8ced8, roughness: 0.18, metalness: 1 }),
     cable: new THREE.MeshStandardMaterial({ color: 0xb3262a, roughness: 0.55, metalness: 0.05 }),
   };
+  for (const mat of Object.values(m)) mat.userData.partage = true;
   cacheCommuns.set(qualite, m);
   return m;
 }
@@ -420,7 +422,7 @@ function piecesPulsar(A, C, mob, detail) {
   };
 }
 
-const CONSTRUCTEURS = { fusil: piecesFusil, pistolet: piecesPistolet, pompe: piecesPompe, sniper: piecesSniper, couteau: piecesCouteau, pulsar: piecesPulsar };
+const CONSTRUCTEURS = { fusil: piecesFusil, pistolet: piecesPistolet, pompe: piecesPompe, sniper: piecesSniper, couteau: piecesCouteau, pulsar: (A, C, mob, detail) => (detail ? piecesPulsarHD(A, C, mob) : piecesPulsar(A, C, mob, detail)) };
 
 // Détails non fusionnables (transparents ou animés) : écran numérique des munitions et marquage du Pulsar.
 // Retourne { ecran } quand l'arme possède un écran, sinon null.

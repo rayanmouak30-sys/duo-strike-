@@ -6,7 +6,8 @@ import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js";
 import { Personnage } from "./personnages.js";
 import { HEROS, CATEGORIES } from "./heros.js";
 import { piecesArme, materiauxArme, detailsArme, dessinerEcran, ARMES } from "./armes.js";
-import { ornerArme, skinArme, RARETES, animerSkins } from "./skins.js";
+import { ornerArme, skinArme, RARETES, animerSkins, oublierOrnements } from "./skins.js";
+import { libererObjet, CacheBorne } from "./formes.js";
 
 export class Vitrine {
   constructor(qualite) {
@@ -54,10 +55,11 @@ export class Vitrine {
     this.faisceau = new THREE.Mesh(new THREE.CylinderGeometry(0.55, 0.7, 2.6, 32, 1, true).translate(0, 1.3, 0), this.matFaisceau);
     this.scene.add(this.balayage, this.faisceau);
 
-    this.modeles = new Map();
+    // Aperçus construits : seuls les 6 derniers personnages et les 6 dernières armes restent en mémoire
+    this.modeles = new CacheBorne(6, (m) => m.liberer());
     this.modele = null;
     this.arme = null;
-    this.armes = new Map();
+    this.armes = new CacheBorne(6, (pivot) => { oublierOrnements(pivot); libererObjet(pivot); });
     this.apparitionT = 1;
     this.rotation = 0.35;
     this.rotationCible = 0.35;
@@ -114,7 +116,7 @@ export class Vitrine {
       const m = new Personnage(id, "vitrine", this.qualite, HEROS[id].arme, tenue);
       for (const mesh of m.maillages) mesh.material.clippingPlanes = [this.decoupe];
       m.ombre.visible = false;
-      this.modeles.set(cle, m);
+      this.modeles.set(cle, m, (x) => x === this.modele);
     }
     return this.modeles.get(cle);
   }
@@ -157,7 +159,7 @@ export class Vitrine {
       g.position.sub(centre);
       pivot.add(g);
       pivot.userData.longueur = boite.getSize(new THREE.Vector3()).length();
-      this.armes.set(cle, pivot);
+      this.armes.set(cle, pivot, (x) => x === this.arme);
     }
     this.arme = this.armes.get(cle);
     this.scene.add(this.arme);

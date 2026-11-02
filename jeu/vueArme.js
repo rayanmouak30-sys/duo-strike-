@@ -1,11 +1,11 @@
 // Vue à la première personne : bras gantés + arme active (pistolet, fusil, pompe, précision, couteau).
 // Animations : sortie de l'arme, recul à ressorts, culasse, pompe, verrou, rechargements, coups de couteau.
 import * as THREE from "three";
-import { boiteRonde, membre, revolution, Assemblage, ik2, Ressort } from "./formes.js";
+import { boiteRonde, membre, revolution, Assemblage, ik2, Ressort, libererObjet, CacheBorne } from "./formes.js";
 import { textureEclat, textureTissu } from "./textures.js";
 import { textureReticuleHolo } from "./reticules.js";
 import { piecesArme, materiauxArme, detailsArme, dessinerEcran, ARMES } from "./armes.js";
-import { ornerArme, skinArme } from "./skins.js";
+import { ornerArme, skinArme, oublierOrnements } from "./skins.js";
 
 // Placement de chaque arme dans le champ de vision
 const CADRAGE = {
@@ -116,7 +116,9 @@ export class VueArme {
     this.iDouille = 0;
     this.matsBase = matsBase;
 
-    this.cache = new Map();
+    // Modèles construits (arme|skin) : les plus anciens sont libérés au-delà de 8
+    this.cache = new CacheBorne(8, (m) => { oublierOrnements(m.racine); libererObjet(m.racine); });
+    this.enUsage = (x) => x === this.modele || (this.rangement && (x === this.rangement.ancien || x === this.rangement.suivant));
     this.modele = null;
     this.ressortZ = new Ressort(260, 22);
     this.ressortRx = new Ressort(220, 20);
@@ -183,7 +185,7 @@ export class VueArme {
   // Sort une arme (animation de sortie de durée "duree").
   equiper(id, skin = "standard", duree = 0.6) {
     const cle = id + "|" + skin;
-    if (!this.cache.has(cle)) this.cache.set(cle, this.construireModele(id, skin));
+    if (!this.cache.has(cle)) this.cache.set(cle, this.construireModele(id, skin), this.enUsage);
     const m = this.cache.get(cle);
     // L'arme en main est d'abord rangée (vers le bas), la nouvelle sort ensuite : la durée totale reste celle du jeu
     const ancien = this.rangement ? this.rangement.ancien : this.modele;
@@ -223,7 +225,7 @@ export class VueArme {
   prechauffer(ids, skins = {}) {
     for (const id of ids) {
       const cle = id + "|" + (skins[id] || "standard");
-      if (!this.cache.has(cle)) this.cache.set(cle, this.construireModele(id, skins[id] || "standard"));
+      if (!this.cache.has(cle)) this.cache.set(cle, this.construireModele(id, skins[id] || "standard"), this.enUsage);
     }
   }
 

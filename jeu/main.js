@@ -829,7 +829,7 @@ function majKillcam() {
   const teinteJoueur = MODES[regles.mode].equipes ? "bleu" : "neutre";
   const tenueJoueur = profilJ.tenue(joueur.heros);
   if (!modeleJoueur || modeleJoueur.armeId !== arme || modeleJoueur.heros !== joueur.heros || modeleJoueur.teinte !== teinteJoueur || modeleJoueur.tenue !== tenueJoueur) {
-    if (modeleJoueur) scene.remove(modeleJoueur.racine);
+    if (modeleJoueur) modeleJoueur.liberer();
     modeleJoueur = new Personnage(joueur.heros, teinteJoueur, qualite, arme, tenueJoueur);
     scene.add(modeleJoueur.racine);
   }

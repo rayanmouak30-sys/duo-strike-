@@ -10,6 +10,10 @@ import { textureTissu, texturePlaque } from "./textures.js";
 import { piecesArme } from "./armes.js";
 import { HEROS } from "./heros.js";
 import { apparenceAvecSkin, habillerMateriaux } from "./skins.js";
+import { construireKael } from "./modeles/kael.js";
+
+// Personnages refaits en haute fidélité (corps continu, tête sculptée, tenue en couches)
+const MODELES_HD = { kael: construireKael };
 import { mergeGeometries } from "three/addons/utils/BufferGeometryUtils.js";
 
 // Équipe alliée en or, adverse en rouge : toujours distinctes
@@ -63,6 +67,7 @@ function materiauxHeros(qualite, cle, a, teinte, tenue = "origine") {
     equipe: new THREE.MeshStandardMaterial({ color: equipe, emissive: equipe, emissiveIntensity: 1.1, roughness: 0.4 }),
     lentille: new THREE.MeshStandardMaterial({ color: 0x220806, emissive: equipe, emissiveIntensity: 0.9, roughness: 0.2, metalness: 0.5 }),
     peau: new THREE.MeshStandardMaterial({ color: a.peau, roughness: 0.62 }),
+    levres: new THREE.MeshStandardMaterial({ color: new THREE.Color(a.peau).lerp(new THREE.Color(0x9a4a3c), 0.35).multiplyScalar(0.85), roughness: 0.5 }),
     cheveux: new THREE.MeshStandardMaterial({ color: a.cheveux, roughness: 0.72, metalness: 0.05 }),
     iris: new THREE.MeshStandardMaterial({ color: a.yeux, roughness: 0.2 }),
     irisLumineux: new THREE.MeshStandardMaterial({ color: a.yeux, emissive: a.yeux, emissiveIntensity: 1.6, roughness: 0.2 }),
@@ -71,7 +76,7 @@ function materiauxHeros(qualite, cle, a, teinte, tenue = "origine") {
   mats.base = new THREE.MeshLambertMaterial({ vertexColors: true });
   mats.lueur = new THREE.MeshBasicMaterial({ vertexColors: true });
   // Tenue : motif, finition et lueurs sur l'armure et les pièces secondaires (qualités Moyenne et Haute)
-  habillerMateriaux(mats, tenue, qualite);
+  habillerMateriaux(mats, tenue, qualite, teinte === "vitrine");
   cacheMateriaux.set(id, mats);
   return mats;
 }
@@ -626,7 +631,8 @@ const HANCHE_GAUCHE = new THREE.Vector3(-0.2, -0.36, 0.06);
 export class Personnage {
   // heros : identifiant (heros.js) ; teinte : "bleu", "rouge" (bandes d'équipe), "neutre", "vitrine" ou "mannequin"
   // tenue : skin de personnage (skins.js) — palette, motif et lueurs, sans changer la silhouette
-  constructor(heros, teinte, qualite, armeId = "fusil", tenue = "origine") {
+  // detail : niveau de détail des formes (1 = complet ; les bots en partie utilisent une version allégée)
+  constructor(heros, teinte, qualite, armeId = "fusil", tenue = "origine", detail = 1) {
     const h = HEROS[heros];
     this.tenue = h ? tenue : "origine";
     const a = h ? apparenceAvecSkin(h.apparence, this.tenue) : APPARENCE_MANNEQUIN;
@@ -644,11 +650,15 @@ export class Personnage {
     this.echelle = a.taille || 1;
     const os = [];
     const pieces = [];
-    const cleCache = this.heros + "|" + armeId + (simple ? "|" + teinte + "|" + this.tenue : "");
+    const niveauDetail = simple ? 0.6 : detail;
+    const cleCache = this.heros + "|" + armeId + "|" + niveauDetail + (simple ? "|" + teinte + "|" + this.tenue : "");
     const enCache = cacheGeometries.get(cleCache);
-    DETAIL = simple ? 0.6 : 1;
+    DETAIL = niveauDetail;
     const nouvelOs = (parent) => { const b = new THREE.Bone(); os.push(b); if (parent) parent.add(b); return b; };
-    const habiller = (b, fn, ...args) => { if (enCache) return; const A = new Assemblage(); fn(A, ...args); pieces.push({ os: b, pieces: A.extraire() }); };
+    const hd = !!(h && MODELES_HD[this.heros]);
+    this.hauteFidelite = hd;
+    // Modèle haute fidélité : le corps est construit d'un bloc plus bas (même squelette), seules les pièces de l'arme passent par ici
+    const habiller = (b, fn, ...args) => { if (enCache || hd) return; const A = new Assemblage(); fn(A, ...args); pieces.push({ os: b, pieces: A.extraire() }); };
 
     this.corps = nouvelOs(null);
     this.corps.scale.setScalar(this.echelle);
@@ -742,6 +752,34 @@ export class Personnage {
           }
         }
       }
+      // Corps haute fidélité : géométries déjà pondérées sur plusieurs os (repère du corps → repère du monde)
+      if (hd) {
+        this.racine.updateMatrixWorld(true);
+        const parties = MODELES_HD[this.heros]({ corps: this.corps, bassin: this.bassin, colonne: this.colonne, poitrine: this.poitrine, tete: this.tete, jambes: this.jambes, bras: this.bras }, (b) => os.indexOf(b), niveauDetail);
+        for (const [cleMat, geos] of parties) {
+          const cleFinale = simple ? (LUEURS.has(cleMat) ? "lueur" : "base") : cleMat;
+          if (simple) {
+            const mat = mats[cleMat];
+            couleur.copy(mat ? mat.color : couleur.setHex(0x888888));
+            if (mat && mat.emissive && LUEURS.has(cleMat)) couleur.copy(mat.emissive);
+          }
+          for (const brut of geos) {
+            const g = brut.index ? brut.toNonIndexed() : brut;
+            if (g !== brut) brut.dispose();
+            g.applyMatrix4(this.corps.matrixWorld);
+            for (const nom of Object.keys(g.attributes)) if (!["position", "normal", "uv", "skinIndex", "skinWeight"].includes(nom)) g.deleteAttribute(nom);
+            if (!g.attributes.uv) g.setAttribute("uv", new THREE.Float32BufferAttribute(new Float32Array(g.attributes.position.count * 2), 2));
+            g.clearGroups();
+            if (simple) {
+              const n = g.attributes.position.count, col = new Float32Array(n * 3);
+              for (let i = 0; i < n; i++) { col[i * 3] = couleur.r; col[i * 3 + 1] = couleur.g; col[i * 3 + 2] = couleur.b; }
+              g.setAttribute("color", new THREE.BufferAttribute(col, 3));
+            }
+            if (!parMateriau.has(cleFinale)) parMateriau.set(cleFinale, []);
+            parMateriau.get(cleFinale).push(g);
+          }
+        }
+      }
       geometries = new Map();
       for (const [cle, geos] of parMateriau) {
         geometries.set(cle, mergeGeometries(geos, false));
@@ -785,6 +823,13 @@ export class Personnage {
   }
 
   tir() { this.ressortTir.impulsion(2.2); }
+
+  // À appeler quand le modèle quitte définitivement la scène : libère la texture des os du squelette
+  // (géométries et matériaux sont partagés en cache, ils restent)
+  liberer() {
+    if (this.racine.parent) this.racine.parent.remove(this.racine);
+    if (this.squelette) this.squelette.dispose();
+  }
 
   // Réaction à un impact : direction locale (x : gauche/droite, z : avant/arrière)
   impact(dx, dz, fort) {

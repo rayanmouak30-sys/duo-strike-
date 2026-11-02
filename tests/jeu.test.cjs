@@ -22,13 +22,20 @@ const BASE = `http://127.0.0.1:${PORT}`;
 const resultats = [];
 let erreursConsole = [];
 
+// Limite par test : un blocage devient un échec au lieu de figer toute la suite
+const LIMITE_TEST = 300000;
+let sonde = null; // facultatif (DUO_MEMOIRE=1) : mémoire du navigateur après chaque test
 async function test(nom, fn) {
   const debut = Date.now();
+  let minuterie;
   try {
-    await fn();
+    await Promise.race([fn(), new Promise((_, rejeter) => { minuterie = setTimeout(() => rejeter(new Error(`bloqué plus de ${LIMITE_TEST / 1000} s`)), LIMITE_TEST); })]);
+    clearTimeout(minuterie);
+    if (sonde) console.log("      " + JSON.stringify(await sonde().catch((e) => e.message)));
     resultats.push({ nom, ok: true, ms: Date.now() - debut });
     console.log(`  ✔ ${nom}`);
   } catch (e) {
+    clearTimeout(minuterie);
     resultats.push({ nom, ok: false, ms: Date.now() - debut, erreur: e.message });
     console.log(`  ✘ ${nom}\n      ${e.message.split("\n").join("\n      ")}`);
   }
@@ -39,7 +46,7 @@ function verifier(condition, message) { if (!condition) throw new Error(message)
 async function principal() {
   const php = spawn("php", ["-S", `127.0.0.1:${PORT}`], { cwd: RACINE, stdio: "ignore" });
   await new Promise((r) => setTimeout(r, 800));
-  const navigateur = await chromium.launch({ args: ["--use-gl=angle", "--use-angle=swiftshader", "--enable-unsafe-swiftshader", "--ignore-gpu-blocklist"] });
+  const navigateur = await chromium.launch({ args: ["--use-gl=angle", "--use-angle=swiftshader", "--enable-unsafe-swiftshader", "--ignore-gpu-blocklist", "--enable-precise-memory-info"] });
   const contexte = await navigateur.newContext({ viewport: { width: 1280, height: 720 } });
   // Qualité basse (rendu logiciel lent), pas de fenêtre de compte au démarrage
   await contexte.addInitScript(() => {
@@ -57,6 +64,7 @@ async function principal() {
   page.on("response", (r) => { if (r.status() >= 400 && !r.url().includes("favicon")) erreursConsole.push(`HTTP ${r.status()}: ${r.url()}`); });
 
   const ev = (fn, arg) => page.evaluate(fn, arg);
+  if (process.env.DUO_MEMOIRE) sonde = () => ev(() => { const n = window.__neon, m = performance.memory; return { mo: m ? Math.round(m.usedJSHeapSize / 1e6) : null, geo: n.renderer.info.memory.geometries, tex: n.renderer.info.memory.textures, prog: n.renderer.info.programs ? n.renderer.info.programs.length : null }; });
 
   try {
     console.log("\nDémarrage");
@@ -432,19 +440,21 @@ async function principal() {
     await test("Retour au menu puis nouvelle partie, sans fuite de géométries", async () => {
       const r = await ev(async () => {
         const n = window.__neon;
-        const mesures = [];
+        const mesures = [], textures = [];
         for (let i = 0; i < 3; i++) {
           n.allerAuMenu();
           await new Promise((res) => setTimeout(res, 50));
           await n.demarrerPartie();
           n.avancer(2);
           mesures.push(n.renderer.info.memory.geometries);
+          textures.push(n.renderer.info.memory.textures);
         }
-        return { mesures, etat: n.partie.etat };
+        return { mesures, textures, etat: n.partie.etat };
       });
       verifier(r.etat === "jeu", "la partie ne redémarre pas");
       const [a, , c] = r.mesures;
       verifier(c <= a * 1.15 + 20, "le nombre de géométries augmente : " + r.mesures.join(" → "));
+      verifier(r.textures[2] <= r.textures[0] + 4, "le nombre de textures augmente (fuite) : " + r.textures.join(" → "));
     });
 
     console.log("\nCapacités (stand de tir, 20 personnages × 4)");

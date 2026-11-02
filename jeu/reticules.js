@@ -66,6 +66,7 @@ export function textureReticuleHolo() {
     toileHolo.width = toileHolo.height = 128;
     texHolo = new THREE.CanvasTexture(toileHolo);
     texHolo.colorSpace = THREE.SRGBColorSpace;
+    texHolo.userData.partage = true;
     dessinerHolo(toileHolo, reticuleHolo("cerclePoint"));
   }
   return texHolo;

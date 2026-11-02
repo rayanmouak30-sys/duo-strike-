@@ -168,6 +168,7 @@ export function materiauxSkinArme(qualite, skinId, communs) {
   } else if (s.rarete !== "standard") {
     m.lame = peinture(s, qualite, [0xc8ced8, eclaircir(B, 1.4), C], { echelle: 1.4, rugosite: [0.16, 0.25, 0.2], metal: [1, 0.9, 1] });
   }
+  for (const mat of Object.values(m)) mat.userData.partage = true;   // partagés : jamais libérés avec un modèle
   cacheArmes.set(cle, m);
   return m;
 }
@@ -200,7 +201,7 @@ const ORNEMENTS = {
     const zc = b.centre.z - b.l * 0.1, yc = b.centre.y + b.h * 0.05;
     conduit.position.set(b.cote(1, yc, zc) + 0.004, yc, zc);
     g.add(conduit);
-    animes.add({ maj: (t) => mats.forEach((m, i) => { m.emissiveIntensity = 1.2 + 2.2 * Math.pow(0.5 + 0.5 * Math.sin(t * 5 - i * 1.4), 2); }) });
+    animes.add({ g, maj: (t) => mats.forEach((m, i) => { m.emissiveIntensity = 1.2 + 2.2 * Math.pow(0.5 + 0.5 * Math.sin(t * 5 - i * 1.4), 2); }) });
   },
   // Éclats de cristal posés sur le dessus de l'arme
   cristaux(g, s, b) {
@@ -239,7 +240,7 @@ const ORNEMENTS = {
       pointe.position.set(bouche.x + Math.cos(a) * r, bouche.y + Math.sin(a) * r, bouche.z - r * 0.15);
       g.add(pointe);
     }
-    animes.add({ maj: (t) => { rubis.emissiveIntensity = 0.4 + 0.5 * (0.5 + 0.5 * Math.sin(t * 1.2)); } });
+    animes.add({ g, maj: (t) => { rubis.emissiveIntensity = 0.4 + 0.5 * (0.5 + 0.5 * Math.sin(t * 1.2)); } });
   },
   // Deux anneaux holographiques en rotation autour du canon
   anneauxHolo(g, s, b, bouche) {
@@ -252,7 +253,7 @@ const ORNEMENTS = {
       g.add(a);
       anneaux.push(a);
     }
-    animes.add({ maj: (t) => { anneaux[0].rotation.z = t * 1.6; anneaux[1].rotation.z = -t * 1.1; } });
+    animes.add({ g, maj: (t) => { anneaux[0].rotation.z = t * 1.6; anneaux[1].rotation.z = -t * 1.1; } });
   },
   // Paratonnerres et arc électrique qui se redessine en permanence
   paratonnerres(g, s, b) {
@@ -277,7 +278,7 @@ const ORNEMENTS = {
     arc.frustumCulled = false;
     g.add(arc);
     let prochain = 0;
-    animes.add({ maj: (t) => {
+    animes.add({ g, maj: (t) => {
       if (t < prochain) return;
       prochain = t + 0.06 + Math.random() * 0.08;
       arc.visible = Math.random() > 0.25;
@@ -310,7 +311,7 @@ const ORNEMENTS = {
       o.position.set(b.cote(sx, yo, zo) + sx * 0.001, yo, zo);
       g.add(o);
     }
-    animes.add({ maj: (t) => { oeil.emissiveIntensity = 1.5 + Math.max(0, Math.sin(t * 0.9)) * 2; } });
+    animes.add({ g, maj: (t) => { oeil.emissiveIntensity = 1.5 + Math.max(0, Math.sin(t * 0.9)) * 2; } });
   },
 };
 
@@ -396,7 +397,8 @@ export function apparenceAvecSkin(apparence, skinId) {
 }
 
 // Motif d'une tenue sur les matériaux d'un personnage (armure et pièces secondaires)
-export function habillerMateriaux(mats, skinId, qualite) {
+// luxe : vernis et irisation (vitrine des menus) ; en partie, matériau standard plus léger avec le même motif et les mêmes lueurs
+export function habillerMateriaux(mats, skinId, qualite, luxe = false) {
   const s = skinAgent(skinId);
   if (!s.motif || qualite === "basse") return;
   const tex = textureMotif(s.motif, s.graine, qualite);
@@ -406,12 +408,23 @@ export function habillerMateriaux(mats, skinId, qualite) {
   });
   const remplacer = (cle, couleurs, k) => {
     const ancien = mats[cle];
-    const m = new THREE.MeshPhysicalMaterial({ color: 0xffffff, normalMap: ancien && ancien.normalMap, clearcoat: s.vernis || 0, clearcoatRoughness: 0.2, iridescence: s.iridescence || 0, emissive: 0x000000 });
+    const m = luxe
+      ? new THREE.MeshPhysicalMaterial({ color: 0xffffff, normalMap: ancien && ancien.normalMap, clearcoat: s.vernis || 0, clearcoatRoughness: 0.2, iridescence: s.iridescence || 0, emissive: 0x000000 })
+      : new THREE.MeshStandardMaterial({ color: 0xffffff, normalMap: ancien && ancien.normalMap, emissive: 0x000000 });
     mats[cle] = appliquerMotif(m, options(couleurs, k));
   };
   const [A, B, C] = s.palette;
   remplacer("armure", [A, B, C], 1);
   remplacer("secondaire", [B, A, C], 1.4);
+}
+
+// Oublie les ornements animés d'un modèle détruit (sinon ils restent en mémoire et sont animés pour rien)
+export function oublierOrnements(racine) {
+  for (const a of animes) {
+    let o = a.g;
+    while (o && o !== racine) o = o.parent;
+    if (o) animes.delete(a);
+  }
 }
 
 // Mise à jour par image : lueurs des motifs et ornements animés

@@ -309,6 +309,7 @@ export function textureMotif(type, graine = 1, qualite = "moyenne") {
   t.generateMipmaps = true;
   t.anisotropy = 4;
   t.needsUpdate = true;
+  t.userData.partage = true;
   cacheMotifs.set(cle, t);
   return t;
 }

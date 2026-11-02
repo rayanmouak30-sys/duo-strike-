@@ -121,6 +121,46 @@ export class Assemblage {
   }
 }
 
+// Libère un modèle retiré pour de bon : géométries, matériaux et textures qui lui sont propres.
+// Les matériaux et textures marqués userData.partage (caches communs) sont conservés.
+export function libererObjet(racine) {
+  if (racine.parent) racine.parent.remove(racine);
+  racine.traverse((o) => {
+    if (o.geometry) o.geometry.dispose();
+    for (const m of [].concat(o.material || [])) {
+      if (!m || (m.userData && m.userData.partage)) continue;
+      for (const v of Object.values(m)) if (v && v.isTexture && !(v.userData && v.userData.partage)) v.dispose();
+      m.dispose();
+    }
+  });
+}
+
+// Cache borné : garde les n dernières entrées utilisées, appelle liberer() sur celles qui sortent
+export class CacheBorne {
+  constructor(n, liberer) { this.n = n; this.liberer = liberer; this.m = new Map(); }
+  has(cle) { return this.m.has(cle); }
+  get(cle) {
+    if (!this.m.has(cle)) return undefined;
+    const v = this.m.get(cle);
+    this.m.delete(cle); this.m.set(cle, v);   // devient la plus récente
+    return v;
+  }
+  // garder(v) : true pour une entrée qui ne doit pas sortir maintenant (en cours d'utilisation)
+  set(cle, v, garder = () => false) {
+    this.m.delete(cle);
+    this.m.set(cle, v);
+    for (const [k, x] of this.m) {
+      if (this.m.size <= this.n) break;
+      if (k === cle || garder(x)) continue;
+      this.m.delete(k);
+      this.liberer(x);
+    }
+    return this;
+  }
+  values() { return this.m.values(); }
+  get size() { return this.m.size; }
+}
+
 // ===== Cinématique inverse à deux os =====
 // os1 et os2 ont leur axe de repos vers -Y. cible et pole sont exprimés dans l'espace du parent de os1.
 const _d = new THREE.Vector3(), _w = new THREE.Vector3(), _u = new THREE.Vector3(), _f = new THREE.Vector3();

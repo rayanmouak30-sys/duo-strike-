@@ -103,20 +103,21 @@ export class GestionBots {
   }
 
   retirer(b) {
-    if (b.modele) this.scene.remove(b.modele.racine);
+    if (b.modele) b.modele.liberer();
     this.liste = this.liste.filter((x) => x !== b);
   }
 
   vider() {
-    for (const b of this.liste) if (b.modele) this.scene.remove(b.modele.racine);
+    for (const b of this.liste) if (b.modele) b.modele.liberer();
     this.liste = [];
   }
 
   // Met le bot en jeu (début de manche ou réapparition) avec son arme.
   placer(b, x, z, yaw = Math.PI) {
     if (!b.modele || b.modele.armeId !== b.arme || b.modele.heros !== (b.mannequin ? "mannequin" : b.heros) || b.modele.tenue !== (b.mannequin ? "origine" : b.tenue)) {
-      if (b.modele) this.scene.remove(b.modele.racine);
-      b.modele = new Personnage(b.mannequin ? "mannequin" : b.heros, b.mannequin ? "mannequin" : b.teinte, this.qualite, b.arme, b.mannequin ? "origine" : b.tenue);
+      if (b.modele) b.modele.liberer();
+      // En partie : formes allégées (les bots sont vus de loin et en mouvement ; la vitrine garde le détail complet)
+      b.modele = new Personnage(b.mannequin ? "mannequin" : b.heros, b.mannequin ? "mannequin" : b.teinte, this.qualite, b.arme, b.mannequin ? "origine" : b.tenue, 0.62);
       this.scene.add(b.modele.racine);
     } else b.modele.ressusciter();
     const def = ARMES[b.arme];
