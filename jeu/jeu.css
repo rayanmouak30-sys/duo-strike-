@@ -36,10 +36,7 @@ h3 { font-family: var(--titre); font-size: 14px; letter-spacing: 3px; color: var
 
 #lunette { inset: 0; opacity: 0; transition: opacity 0.08s; }
 #lunette .cercle { position: absolute; left: 50%; top: 50%; width: 92vh; height: 92vh; transform: translate(-50%, -50%); border-radius: 50%; box-shadow: 0 0 0 200vmax #000, inset 0 0 60px 20px rgba(0, 0, 0, 0.85); }
-#lunette i { position: absolute; background: rgba(0, 0, 0, 0.9); }
-#lunette i.h { left: 50%; top: 50%; width: 92vh; height: 2px; transform: translate(-50%, -50%); background: linear-gradient(90deg, #000 0 40%, transparent 40% 60%, #000 60%); }
-#lunette i.v { left: 50%; top: 50%; height: 92vh; width: 2px; transform: translate(-50%, -50%); background: linear-gradient(180deg, #000 0 40%, transparent 40% 60%, #000 60%); }
-#lunette::after { content: ""; position: absolute; left: 50%; top: 50%; width: 4px; height: 4px; margin: -2px; border-radius: 50%; background: #ff3a3a; box-shadow: 0 0 6px #ff3a3a; }
+#lunette canvas { position: absolute; left: 50%; top: 50%; width: 92vh; height: 92vh; transform: translate(-50%, -50%); }
 
 #marqueur { left: 50%; top: 50%; width: 26px; height: 26px; margin: -13px; opacity: 0; transition: opacity 0.1s; }
 #marqueur::before, #marqueur::after { content: ""; position: absolute; left: 12px; top: -1px; width: 2px; height: 28px; background: #fff; clip-path: polygon(0 0, 100% 0, 100% 32%, 0 32%, 0 68%, 100% 68%, 100% 100%, 0 100%); transform: rotate(45deg); }
@@ -544,3 +541,14 @@ h2 { color: #f3e3bb; }
 .mini-viseur i:nth-child(3) { width: var(--longueur); height: var(--epaisseur); top: calc(50% - var(--epaisseur) / 2); right: calc(50% + var(--ecart)); }
 .mini-viseur i:nth-child(4) { width: var(--longueur); height: var(--epaisseur); top: calc(50% - var(--epaisseur) / 2); left: calc(50% + var(--ecart)); }
 .mini-viseur b { width: var(--epaisseur); height: var(--epaisseur); left: calc(50% - var(--epaisseur) / 2); top: calc(50% - var(--epaisseur) / 2); }
+
+/* ===== Réticules de visée ===== */
+.sous-titre-reglage { margin: 10px 0 4px; font-size: 13px; font-weight: 700; color: var(--doux); display: flex; justify-content: space-between; gap: 8px; }
+.sous-titre-reglage output { color: var(--cyan); font-weight: 700; }
+.grille-reticules { display: grid; grid-template-columns: repeat(auto-fill, minmax(76px, 1fr)); gap: 6px; margin-bottom: 6px; }
+.reticule-choix { display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 4px 3px 5px; cursor: pointer; background: rgba(10, 9, 7, 0.7); border: 1px solid var(--bord); border-radius: 8px; transition: border-color 0.2s, transform 0.2s; }
+.reticule-choix img { width: 100%; max-width: 72px; aspect-ratio: 3 / 2; border-radius: 5px; display: block; }
+.reticule-choix small { font-size: 10px; line-height: 1.1; color: var(--doux); text-align: center; }
+.reticule-choix:hover { transform: translateY(-2px); border-color: var(--cyan); }
+.reticule-choix.actif { border-color: var(--cyan); box-shadow: 0 0 0 1px var(--cyan), 0 0 14px rgba(240, 207, 134, 0.35); }
+.reticule-choix.actif small { color: var(--texte); }

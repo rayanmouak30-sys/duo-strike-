@@ -2,6 +2,7 @@
 // score et équipes, spike, minimap, fil des éliminations, annonces, récap de manche, tableau des scores.
 import { ARMES } from "./armes.js";
 import { HEROS, CATEGORIES } from "./heros.js";
+import { dessinerLunette } from "./reticules.js";
 import { CAPACITES, ICONES, iconeCapacite } from "./capacites.js";
 
 const $ = (id) => document.getElementById(id);
@@ -58,6 +59,16 @@ export class Hud {
   }
 
   // Applique le style du viseur choisi dans les paramètres
+  // Réticule de la lunette (redessiné à la taille réelle du champ, en pixels de l'écran)
+  reticuleLunette(id = this.idLunette) {
+    this.idLunette = id;
+    const toile = document.getElementById("lunette-reticule");
+    if (!toile) return;
+    const t = Math.max(64, Math.round(innerHeight * 0.92 * Math.min(devicePixelRatio || 1, 2)));
+    if (toile.width !== t) toile.width = toile.height = t;
+    dessinerLunette(toile, id);
+  }
+
   appliquerViseur(v, el = this.el.viseur) {
     el.style.setProperty("--couleur-viseur", v.couleur);
     el.style.setProperty("--longueur", v.longueur + "px");

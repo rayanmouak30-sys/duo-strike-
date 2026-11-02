@@ -12,6 +12,7 @@ import { CARTES, CARTES_JOUABLES } from "./cartes.js";
 import { GestionBots, DIFFICULTES, appliquerDegats } from "./bots.js";
 import { ARMES, SKINS } from "./armes.js";
 import { animerSkins, SKINS_AGENTS, RARETES, COLLECTIONS, vignetteSkin } from "./skins.js";
+import { RETICULES_HOLO, RETICULES_LUNETTE, choisirReticuleHolo, vignetteReticule } from "./reticules.js";
 import { VueArme } from "./vueArme.js";
 import { Personnage } from "./personnages.js";
 import { Hud } from "./hud.js";
@@ -264,7 +265,7 @@ function redimensionner() {
   camera.aspect = innerWidth / innerHeight;
   camera.updateProjectionMatrix();
 }
-addEventListener("resize", redimensionner);
+addEventListener("resize", () => { redimensionner(); hud.reticuleLunette(); });
 redimensionner();
 
 // ===== État de la partie =====
@@ -1940,6 +1941,40 @@ function lierViseur() {
   rafraichisseurs.push(afficher);
 }
 lierViseur();
+
+// Réticules de visée : un clic change le réticule des viseurs point rouge ou de la lunette
+function lierReticules() {
+  const grilles = [
+    { type: "holo", cle: "reticule", liste: RETICULES_HOLO, el: $("reticules-holo"), nom: $("nom-reticule"), appliquer: (id) => choisirReticuleHolo(id) },
+    { type: "lunette", cle: "lunette", liste: RETICULES_LUNETTE, el: $("reticules-lunette"), nom: $("nom-lunette"), appliquer: (id) => hud.reticuleLunette(id) },
+  ];
+  const afficher = () => {
+    for (const g of grilles) {
+      const id = profilJ.d[g.cle];
+      g.appliquer(id);
+      g.nom.textContent = (g.liste.find((r) => r.id === id) || g.liste[0]).nom;
+      for (const b of g.el.children) { const actif = b.dataset.id === id; b.classList.toggle("actif", actif); b.setAttribute("aria-pressed", String(actif)); }
+    }
+  };
+  for (const g of grilles) {
+    for (const r of g.liste) {
+      const b = document.createElement("button");
+      b.type = "button";
+      b.className = "reticule-choix";
+      b.dataset.id = r.id;
+      b.title = `${r.nom} — ${r.texte}`;
+      b.setAttribute("aria-label", "Réticule " + r.nom);
+      b.innerHTML = "<img alt=''><small></small>";
+      b.querySelector("img").src = vignetteReticule(r, g.type);
+      b.querySelector("small").textContent = r.nom;
+      b.addEventListener("click", () => { audio.clic(); profilJ.d[g.cle] = r.id; profilJ.sauver(); afficher(); });
+      g.el.appendChild(b);
+    }
+  }
+  afficher();
+  rafraichisseurs.push(afficher);
+}
+lierReticules();
 
 // ===== Compte : connexion, création, sauvegarde de la progression sur le serveur =====
 const CLE_SANS_COMPTE = "duostrike-sans-compte";

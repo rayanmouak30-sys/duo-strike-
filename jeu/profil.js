@@ -3,6 +3,7 @@
 
 import { herosValide } from "./heros.js";
 import { SKINS_ARMES, SKINS_AGENTS } from "./skins.js";
+import { RETICULES_HOLO, RETICULES_LUNETTE } from "./reticules.js";
 
 export const SUCCES = {
   premiereVictoire: { nom: "Première victoire", texte: "Gagne une partie.", icone: "🏆" },
@@ -49,7 +50,7 @@ const CLE = "duostrike-profil";
 
 function profilVide() {
   return {
-    pseudo: "", xp: 0, niveau: 1, agent: "kael", skins: {}, tenues: {}, viseur: { ...VISEUR_DEFAUT },
+    pseudo: "", xp: 0, niveau: 1, agent: "kael", skins: {}, tenues: {}, viseur: { ...VISEUR_DEFAUT }, reticule: "cerclePoint", lunette: "pointRouge",
     stats: { parties: 0, victoires: 0, kills: 0, morts: 0, tetes: 0, aces: 0, poses: 0, desamorcages: 0, manches: 0 },
     armes: {}, succes: {}, defis: {},
   };
@@ -81,6 +82,8 @@ export class Profil {
     d.niveau = Math.max(1, Math.floor(Number(d.niveau) || 1));
     d.pseudo = String(d.pseudo || "").slice(0, 16);
     d.agent = herosValide(typeof d.agent === "string" ? d.agent : vide.agent);
+    if (!RETICULES_HOLO.some((r) => r.id === d.reticule)) d.reticule = vide.reticule;
+    if (!RETICULES_LUNETTE.some((r) => r.id === d.lunette)) d.lunette = vide.lunette;
     return d;
   }
 

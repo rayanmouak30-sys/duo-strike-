@@ -21,7 +21,7 @@
   <div id="vignette" class="hud"></div>
   <div id="teinte" class="hud"></div>
   <div id="directions" class="hud"></div>
-  <div id="lunette" class="hud"><div class="cercle"></div><i class="h"></i><i class="v"></i></div>
+  <div id="lunette" class="hud"><div class="cercle"></div><canvas id="lunette-reticule"></canvas></div>
   <div id="viseur" class="hud"><i></i><i></i><i></i><i></i><b></b></div>
   <div id="marqueur" class="hud"></div>
 
@@ -391,6 +391,10 @@
         <button type="button" class="bouton-secondaire" id="r-reinitialiser">Réinitialiser tous les paramètres</button>
         <h3>Viseur</h3>
         <div class="viseurs-predefinis" id="viseurs-predefinis" role="group" aria-label="Viseurs prédéfinis"></div>
+        <p class="sous-titre-reglage">Réticule en visée (DS-7 Vecteur, Pulsar P-07) <output id="nom-reticule"></output></p>
+        <div class="grille-reticules" id="reticules-holo" role="group" aria-label="Réticule des viseurs point rouge"></div>
+        <p class="sous-titre-reglage">Réticule de la lunette (Aiguille) <output id="nom-lunette"></output></p>
+        <div class="grille-reticules" id="reticules-lunette" role="group" aria-label="Réticule de la lunette"></div>
         <div class="apercu-viseur"><div id="apercu-viseur"><i></i><i></i><i></i><i></i><b></b></div></div>
         <label for="v-couleur">Couleur <input type="color" id="v-couleur"></label>
         <label for="v-longueur">Longueur <output id="ov-longueur"></output></label>

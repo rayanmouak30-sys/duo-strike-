@@ -2,7 +2,8 @@
 // Animations : sortie de l'arme, recul à ressorts, culasse, pompe, verrou, rechargements, coups de couteau.
 import * as THREE from "three";
 import { boiteRonde, membre, revolution, Assemblage, ik2, Ressort } from "./formes.js";
-import { textureEclat, textureReticule, textureTissu } from "./textures.js";
+import { textureEclat, textureTissu } from "./textures.js";
+import { textureReticuleHolo } from "./reticules.js";
 import { piecesArme, materiauxArme, detailsArme, dessinerEcran, ARMES } from "./armes.js";
 import { ornerArme, skinArme } from "./skins.js";
 
@@ -10,7 +11,8 @@ import { ornerArme, skinArme } from "./skins.js";
 const CADRAGE = {
   fusil: { echelle: 0.9, hanche: [0.16, -0.172, -0.25], viseeZ: -0.2, recul: 1 },
   pistolet: { echelle: 0.92, hanche: [0.12, -0.1, -0.4], viseeZ: -0.4, recul: 1.25 },
-  pompe: { echelle: 0.88, hanche: [0.16, -0.17, -0.23], viseeZ: -0.2, recul: 2.2 },
+  // Briseur : en visée l'arme est plus loin et un peu plus basse, la carcasse ne masque plus le centre de l'écran
+  pompe: { echelle: 0.88, hanche: [0.16, -0.17, -0.23], viseeZ: -0.36, baisseVisee: 0.028, recul: 2.2 },
   sniper: { echelle: 0.82, hanche: [0.15, -0.162, -0.2], viseeZ: -0.1, recul: 2.6 },
   couteau: { echelle: 1.0, hanche: [0.17, -0.16, -0.34], viseeZ: -0.34, recul: 0 },
   pulsar: { echelle: 0.76, hanche: [0.172, -0.2, -0.27], viseeZ: -0.3, recul: 0.95 },
@@ -161,7 +163,7 @@ export class VueArme {
     if (points.reticule) {
       const verre = new THREE.Mesh(new THREE.PlaneGeometry(0.04, 0.034), mats.verre);
       verre.position.set(0, points.viseur.y + 0.0015, points.viseur.z);
-      const reticule = new THREE.Mesh(new THREE.PlaneGeometry(0.03, 0.03), new THREE.MeshBasicMaterial({ map: textureReticule(), transparent: true, depthWrite: false, toneMapped: false }));
+      const reticule = new THREE.Mesh(new THREE.PlaneGeometry(0.03, 0.03), new THREE.MeshBasicMaterial({ map: textureReticuleHolo(), transparent: true, depthWrite: false, toneMapped: false }));
       reticule.position.set(points.viseur.x, points.viseur.y, points.viseur.z - 0.005);
       groupe.add(verre, reticule);
     }
@@ -174,7 +176,7 @@ export class VueArme {
       pieces: { chargeur, culasse, levier, pompe },
       chargeurRepos: chargeur.position.clone(),
       hanche: new THREE.Vector3(...cfg.hanche),
-      visee: new THREE.Vector3(0, -points.viseur.y * cfg.echelle, cfg.viseeZ),
+      visee: new THREE.Vector3(0, -points.viseur.y * cfg.echelle - (cfg.baisseVisee || 0), cfg.viseeZ),
     };
   }
 
