@@ -4,6 +4,7 @@
 import * as THREE from "three";
 import { Assemblage, boiteRonde, revolution } from "./formes.js";
 import { textureOmbreContact, texturePeinture, textureMetal, uvMonde } from "./textures.js";
+import { habillerDepartNexus } from "./modeles/departNexus.js";
 
 function texte(lignes, couleur, fond, l = 512, h = 128) {
   const c = document.createElement("canvas");
@@ -59,6 +60,7 @@ export function decorer({ groupe, monde, mat, qualite, ombres, nexus = false }) 
   ];
   for (const m of murExt) {
     for (let t = m.de + 2; t <= m.a - 1; t += 6) {
+      if (m.fixe === 22 && Math.abs(t) < 7) continue;   // mur sud : place au portail de la zone de départ
       const pos = m.axe === "x" ? [t, 3.5, m.fixe + m.sens * 0.18] : [m.fixe + m.sens * 0.18, 3.5, t];
       A.ajouter(uvMonde(new THREE.BoxGeometry(m.axe === "x" ? 0.7 : 0.36, 7, m.axe === "x" ? 0.36 : 0.7), m.axe === "x" ? 0.7 : 0.36, 7, m.axe === "x" ? 0.36 : 0.7, 4), "mur", { p: pos });
     }
@@ -159,6 +161,9 @@ export function decorer({ groupe, monde, mat, qualite, ombres, nexus = false }) 
     monde.ajouter(cx - 1.4, 0, cz - 1.9, cx + 1.4, 0.55, cz - 1.0, { type: "sacs" });
   }
 
+  // ----- Zone de départ des attaquants (portion de référence très détaillée) -----
+  groupe.add(habillerDepartNexus({ A, monde, mats, riche }));
+
   // ----- Projecteurs sur poteaux (sites A et B) -----
   for (const [x, z, ry] of [[29.5, -10.5, -2.4], [-29.5, -10.5, 2.4]]) {
     A.ajouter(new THREE.CylinderGeometry(0.08, 0.1, 6, 10), "sombre", { p: [x, 3, z] });
@@ -247,7 +252,7 @@ export function decorer({ groupe, monde, mat, qualite, ombres, nexus = false }) 
     { t: texte(["NEXUS LOGISTIQUE"], "#e8e8f0", "#11141b"), x: 0, y: 5.6, z: 22 - 0.05, ry: Math.PI, l: 6, h: 1.1 },
     { t: texte(["⚠ HAUTE TENSION"], "#16181d", "#e8b419", 512, 96), x: 12.5, y: 2.1, z: -12.42, ry: 0, l: 1.1, h: 0.2 },
     { t: texte(["⚠ HAUTE TENSION"], "#16181d", "#e8b419", 512, 96), x: -12.5, y: 2.1, z: -12.42, ry: 0, l: 1.1, h: 0.2 },
-    { t: texte(["ZONE DE DÉPART"], "#f0cf86", "#14110a"), x: 0, y: 2.4, z: 21.95, ry: Math.PI, l: 2.6, h: 0.65 },
+    { t: texte(["ZONE DE DÉPART"], "#f0cf86", "#14110a"), x: 0, y: 4.2, z: 21.37, ry: Math.PI, l: 2.4, h: 0.5 },
   ];
   for (const p of panneaux) {
     const m = new THREE.Mesh(new THREE.PlaneGeometry(p.l, p.h), new THREE.MeshStandardMaterial({ map: p.t, roughness: 0.6, emissive: 0xffffff, emissiveMap: p.t, emissiveIntensity: 0.25, polygonOffset: true, polygonOffsetFactor: -2 }));

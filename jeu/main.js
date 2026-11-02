@@ -5,6 +5,7 @@ import { EffectComposer } from "three/addons/postprocessing/EffectComposer.js";
 import { RenderPass } from "three/addons/postprocessing/RenderPass.js";
 import { UnrealBloomPass } from "three/addons/postprocessing/UnrealBloomPass.js";
 import { OutputPass } from "three/addons/postprocessing/OutputPass.js";
+import { GTAOPass } from "three/addons/postprocessing/GTAOPass.js";
 import { ShaderPass } from "three/addons/postprocessing/ShaderPass.js";
 import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js";
 import { construireCarte } from "./carte.js";
@@ -220,6 +221,15 @@ if (profil.post) {
   const cible = new THREE.WebGLRenderTarget(innerWidth * profil.ratio, innerHeight * profil.ratio, { type: THREE.HalfFloatType, samples: 4 });
   composer = new EffectComposer(renderer, cible);
   composer.addPass(new RenderPass(scene, camera));
+  // Occlusion ambiante (GTAO) : coins, pieds des murs et dessous des objets s'assombrissent naturellement.
+  // Calculée à demi-résolution (coût réduit), appliquée au décor seulement (pas à l'arme en main).
+  const ao = new GTAOPass(scene, camera, innerWidth / 2, innerHeight / 2, undefined,
+    { radius: 0.6, distanceExponent: 1.4, thickness: 1.2, scale: 1, samples: 12, distanceFallOff: 1 },
+    { lumaPhi: 10, depthPhi: 2, normalPhi: 3, radius: 5, rings: 2, samples: 8 });
+  ao.blendIntensity = 0.85;
+  const tailleAO = ao.setSize.bind(ao);
+  ao.setSize = (l, h) => tailleAO(Math.max(1, Math.round(l / 2)), Math.max(1, Math.round(h / 2)));
+  composer.addPass(ao);
   const passeArme = new RenderPass(vue.scene, vue.camera);
   passeArme.clear = false;
   passeArme.clearDepth = true;
