@@ -24,7 +24,7 @@ import { HEROS, CATEGORIES, LISTE_HEROS, ORDRE_CATEGORIES, herosValide, NOMS_DIF
 import { Vitrine } from "./vitrine.js";
 import { Joueur, nouvellesStats } from "./joueur.js";
 import { Regles, MODES, DEFIS, ARTICLES, OBJECTIF_DM } from "./regles.js";
-import { Profil, SUCCES, NIVEAUX_SKINS, NIVEAUX_TENUES, etatCompte, envoyerResultat, classement, connexion, inscription, deconnexion, chargerSauvegarde, envoyerSauvegarde } from "./profil.js";
+import { Profil, SUCCES, NIVEAUX_SKINS, NIVEAUX_TENUES, VISEURS_PREDEFINIS, etatCompte, envoyerResultat, classement, connexion, inscription, deconnexion, chargerSauvegarde, envoyerSauvegarde } from "./profil.js";
 import { Controles, ACTIONS } from "./controles.js";
 import { Reseau, PartieEnLigne, adresseParDefaut, VERSION_PROTOCOLE } from "./reseau.js";
 
@@ -1890,7 +1890,35 @@ $("r-qualite").addEventListener("change", (e) => {
 function lierViseur() {
   const v = () => profilJ.d.viseur;
   const apercu = $("apercu-viseur");
-  const maj = () => { hud.appliquerViseur(v(), apercu); hud.appliquerViseur(v()); profilJ.sauver(); };
+  // Viseurs prédéfinis : une vignette par modèle, un clic l'applique (le réglage « dynamique » est conservé)
+  const CLES = ["couleur", "longueur", "epaisseur", "ecart", "point", "contour"];
+  const grille = $("viseurs-predefinis");
+  const boutons = VISEURS_PREDEFINIS.map((p) => {
+    const b = document.createElement("button");
+    b.type = "button";
+    b.className = "viseur-predefini";
+    b.title = p.nom;
+    b.setAttribute("aria-label", "Viseur " + p.nom);
+    b.innerHTML = '<span class="mini-viseur"><i></i><i></i><i></i><i></i><b></b></span><small></small>';
+    b.querySelector("small").textContent = p.nom;
+    hud.appliquerViseur({ ...p, dynamique: false }, b.querySelector(".mini-viseur"));
+    b.addEventListener("click", () => {
+      audio.clic();
+      for (const k of CLES) v()[k] = p[k];
+      maj();
+      afficher();
+    });
+    grille.appendChild(b);
+    return { b, p };
+  });
+  const marquerActif = () => {
+    for (const { b, p } of boutons) {
+      const actif = CLES.every((k) => v()[k] === p[k]);
+      b.classList.toggle("actif", actif);
+      b.setAttribute("aria-pressed", String(actif));
+    }
+  };
+  const maj = () => { hud.appliquerViseur(v(), apercu); hud.appliquerViseur(v()); profilJ.sauver(); marquerActif(); };
   const afficher = () => {
     $("v-couleur").value = v().couleur;
     for (const k of ["longueur", "epaisseur", "ecart"]) { $("v-" + k).value = v()[k]; $("ov-" + k).textContent = v()[k]; }
@@ -1907,6 +1935,7 @@ function lierViseur() {
     const c = $("v-" + k);
     c.addEventListener("change", () => { v()[k] = c.checked; maj(); });
   }
+  marquerActif();
   afficher();
   rafraichisseurs.push(afficher);
 }

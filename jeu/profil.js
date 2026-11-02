@@ -27,6 +27,22 @@ export const SUCCES = {
 export const NIVEAUX_SKINS = Object.fromEntries(Object.entries(SKINS_ARMES).map(([id, s]) => [id, s.niveau || 1]));
 export const NIVEAUX_TENUES = Object.fromEntries(Object.entries(SKINS_AGENTS).map(([id, s]) => [id, s.niveau || 1]));
 
+// Viseurs prédéfinis (choix en un clic dans Paramètres → Viseur) ; « dynamique » garde le choix du joueur
+export const VISEURS_PREDEFINIS = [
+  { nom: "Croix dorée", couleur: "#ffd27a", longueur: 7, epaisseur: 2, ecart: 4, point: true, contour: true },
+  { nom: "Point d'or", couleur: "#ffd27a", longueur: 0, epaisseur: 4, ecart: 0, point: true, contour: true },
+  { nom: "Compétition", couleur: "#f0cf86", longueur: 5, epaisseur: 1, ecart: 3, point: false, contour: true },
+  { nom: "Grande croix", couleur: "#ffffff", longueur: 10, epaisseur: 2, ecart: 6, point: false, contour: true },
+  { nom: "Épais", couleur: "#ffd27a", longueur: 6, epaisseur: 3, ecart: 2, point: true, contour: true },
+  { nom: "Serré", couleur: "#fff3c4", longueur: 4, epaisseur: 2, ecart: 1, point: false, contour: true },
+  { nom: "Cyan vif", couleur: "#00ffd0", longueur: 6, epaisseur: 2, ecart: 3, point: true, contour: true },
+  { nom: "Vert classique", couleur: "#43ff6a", longueur: 8, epaisseur: 2, ecart: 4, point: false, contour: true },
+  { nom: "Rose néon", couleur: "#ff4fd8", longueur: 6, epaisseur: 2, ecart: 3, point: true, contour: true },
+  { nom: "Minimal blanc", couleur: "#ffffff", longueur: 3, epaisseur: 1, ecart: 2, point: true, contour: false },
+  { nom: "Sniper", couleur: "#e8b84a", longueur: 14, epaisseur: 1, ecart: 10, point: true, contour: true },
+  { nom: "Sans contour", couleur: "#ffd27a", longueur: 7, epaisseur: 2, ecart: 4, point: true, contour: false },
+];
+
 export const VISEUR_DEFAUT = { couleur: "#ffd27a", longueur: 7, epaisseur: 2, ecart: 4, point: true, contour: true, dynamique: true };
 
 const CLE = "duostrike-profil";

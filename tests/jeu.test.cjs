@@ -382,6 +382,14 @@ async function principal() {
         regler("r-ombres", "aucune"); res.ombres = n.renderer.shadowMap.enabled === false;
         regler("r-effets", "reduits"); res.effets = n.effets.densite === 0.4;
         regler("r-minimap", false); res.minimap = $("minimap").hidden === true;
+        // Viseur prédéfini : un clic l'applique au profil, à l'aperçu et au viseur en jeu
+        const predef = [...document.querySelectorAll(".viseur-predefini")];
+        res.nbViseurs = predef.length === 12;
+        predef.find((b) => b.title === "Point d'or").click();
+        const vis = n.profil.d.viseur;
+        res.viseurApplique = vis.longueur === 0 && vis.point === true && vis.couleur === "#ffd27a" && predef.find((b) => b.title === "Point d'or").classList.contains("actif")
+          && getComputedStyle(document.querySelector("#viseur i")).display === "none";
+        predef.find((b) => b.title === "Croix dorée").click();
         $("r-reinitialiser").click();
         res.reinit = n.reglages.inverserY === false && n.reglages.volumeArmes === 1 && n.reglages.ombres === "auto" && n.effets.densite === 1 && $("minimap").hidden === false && $("r-inverserY").checked === false;
         return res;
